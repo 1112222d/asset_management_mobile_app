@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp"
+    android:padding="20dp">
+
+
+    <TextView
+        android:id="@+id/textContentLV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Asset Name"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/textNameLV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Asset Code"
+        android:textColor="#a5a5a5"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textContentLV"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cate"
+        android:textColor="#FFF"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="2dp"
+        android:paddingTop="2dp"
+        android:background="@drawable/bg_red_status"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintTop_toTopOf="@+id/textNameLV" />
+</androidx.constraintlayout.widget.ConstraintLayout>

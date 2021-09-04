@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="all">
+    <item
+        android:id="@+id/all"
+        android:title="All" />
+    <item
+        android:id="@+id/admin"
+        android:title="Admin" />
+    <item
+        android:id="@+id/staff"
+        android:title="Staff" />
+    <item
+        android:id="@+id/working"
+        android:title="Working" />
+    <item
+        android:id="@+id/breakstaus"
+        android:title="Break" />
+    </group>
+</menu>

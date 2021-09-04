@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/available"
+        android:title="Available" />
+    <item
+        android:id="@+id/notAvailable"
+        android:title="Not Available" />
+    <item
+        android:id="@+id/waitingForRecycling"
+        android:title="Waiting for recycling" />
+    <item
+        android:id="@+id/recycled"
+        android:title="Recycled" />
+
+</menu>

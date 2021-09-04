@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single">
+    <item android:id="@+id/all" android:title=" All" />
+    <item android:id="@+id/availableState" android:title=" Available" />
+    <item android:id="@+id/not_availableState" android:title="Not Available"/>
+    <item android:id="@+id/assigned" android:title=" Assigned"/>
+    <item android:id="@+id/waiting" android:title=" Waiting for recycling"/>
+    <item android:id="@+id/recycled" android:title=" Recycled"/>
+</group>
+</menu>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AssetsManager</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="text_forgot_password">Forgot password? No worries</string>
+    <string name="button_sign_in">Sign in</string>
+    <string name="text_signin_signup">Sign up</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="name_user">Nguyá»…n VÄƒn A</string>
+
+    <string name="text_info_Username">TÃªn Ä‘Äƒng nháº­p : Admin</string>
+    <string name="text_info_BirthDay">NgÃ y sinh : 01/01/1990</string>
+    <string name="text_info_AccountDay">NgÃ y táº¡o tÃ i khoáº£n : 01/01/1990</string>
+    <string name="verify_code">Confirm</string>
+
+</resources>
