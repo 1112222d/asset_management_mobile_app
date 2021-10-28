@@ -208,11 +208,11 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
                         check = false;
                     }
                 }
-                if (ed_note.getText().toString().equals("")) {
-                    MessageDialog.getInstance(CreateNewAssignmentActivity.this, "Error",
-                            "Note must not blank!").show();
-                    check = false;
-                }
+//                if (ed_note.getText().toString().equals("")) {
+//                    MessageDialog.getInstance(CreateNewAssignmentActivity.this, "Error",
+//                            "Note must not blank!").show();
+//                    check = false;
+//                }
                 if (check) {
                     Assignment assignment = new Assignment();
                     assignment.setAssetCode(assetSelect.getAssetCode());
@@ -279,10 +279,12 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if (response.code() == 200) {
+                    users.clear();
+                    listSearchUser.clear();
 //                    users.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
 //                    listSearchUser.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
-                    users.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable"))).collect(Collectors.toList()));
-                    listSearchUser.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable"))).collect(Collectors.toList()));
+                    users.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable")&&!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))).collect(Collectors.toList()));
+                    listSearchUser.addAll(users);
                 }
             }
 

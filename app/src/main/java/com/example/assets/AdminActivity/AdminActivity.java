@@ -25,7 +25,7 @@ public class AdminActivity extends AppCompatActivity implements PopupMenu.OnMenu
     LinearLayout assetManagement;
     LinearLayout userManagement;
     LinearLayout borrowManagement;
-    LinearLayout statisticManagement,logout,returnRequests;
+    LinearLayout statisticManagement,logout,returnRequests,assignRequest;
     RoundedImageView user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +35,7 @@ public class AdminActivity extends AppCompatActivity implements PopupMenu.OnMenu
         userManagement = findViewById(R.id.userManagement);
         borrowManagement = findViewById(R.id.borrowManagement);
         statisticManagement = findViewById(R.id.statistics);
+        assignRequest=findViewById(R.id.assignRequest);
         returnRequests=findViewById(R.id.returnRequests);
         user=findViewById(R.id.imageProfileComment);
         logout=findViewById(R.id.logout);
@@ -55,6 +56,14 @@ public class AdminActivity extends AppCompatActivity implements PopupMenu.OnMenu
                     MainActivity.loginResponse=null;
                     finish();
                 }).setNegativeButton("No",null).show();
+            }
+        });
+        assignRequest.setOnClickListener(v->{
+            if (MainActivity.loginResponse.getFirstLogin()) {
+                openDialog();
+            } else {
+                Intent intent = new Intent(AdminActivity.this, RequestForAssigning.class);
+                startActivity(intent);
             }
         });
         assetManagement.setOnClickListener(v -> {

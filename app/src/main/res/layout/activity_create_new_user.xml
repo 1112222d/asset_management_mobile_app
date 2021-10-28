@@ -222,7 +222,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:hint="Last name"
-
                         android:textAlignment="viewEnd"
                         android:textColor="#5b5b5b"
                         android:textSize="18sp"

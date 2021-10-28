@@ -19,7 +19,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 public class UserActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
-    LinearLayout myAssignment, userRequest, logout;
+    LinearLayout myAssignment, myAsssignRequest, logout;
     RoundedImageView user;
 
     @Override
@@ -28,8 +28,23 @@ public class UserActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         setContentView(R.layout.activity_user);
         myAssignment = findViewById(R.id.myAssignment);
 //        userRequest=findViewById(R.id.userRequest);
+        myAsssignRequest = findViewById(R.id.myAssignRequest);
+
         logout = findViewById(R.id.logout);
         user = findViewById(R.id.imageProfileComment);
+        myAsssignRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MainActivity.loginResponse.getFirstLogin()) {
+                    openDialog();
+                } else {
+//                    Intent intent = new Intent(UserActivity.this, CreateNewAssignActivity.class);
+//                    startActivity(intent);
+                    Intent intent = new Intent(UserActivity.this, MyAssignRequest.class);
+                    startActivity(intent);
+                }
+            }
+        });
         myAssignment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

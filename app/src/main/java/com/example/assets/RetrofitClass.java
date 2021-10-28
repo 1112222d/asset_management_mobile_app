@@ -20,7 +20,7 @@ public class RetrofitClass {
         if (retrofit == null) {
             Gson gson = new GsonBuilder().create();
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-            retrofit = new Retrofit.Builder().baseUrl("https://asset-tttn.herokuapp.com/api/")
+            retrofit = new Retrofit.Builder().baseUrl("https://api-ptithcm-v2.herokuapp.com/api/")
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(httpClient.build())
                     .build();
@@ -40,7 +40,7 @@ public class RetrofitClass {
 
          retrofit = new Retrofit.Builder()
                 .client(client)
-                .baseUrl("https://asset-tttn.herokuapp.com/api/")
+                .baseUrl("https://api-ptithcm-v2.herokuapp.com/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         return retrofit;

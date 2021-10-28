@@ -1,6 +1,8 @@
 package com.example.assets;
 
 import com.example.assets.Model.Asset;
+import com.example.assets.Model.AssignRequestEntity;
+import com.example.assets.Model.AssignRequestRespone;
 import com.example.assets.Model.Assignment;
 import com.example.assets.Model.Category;
 import com.example.assets.Model.ChangePasswordRequest;
@@ -68,7 +70,7 @@ public interface Service {
     @GET("assignment/home")
     Call<List<Assignment>> getAllAssignmentUser();
     @PUT("assignment/staff/{assignmentId}")
-    Call<Assignment> changeStateStaffAssignment(@Path("assignmentId") Long assignmentId,@Query("state") String state);
+    Call<Assignment> changeStateStaffAssignment(@Path("assignmentId") Long assignmentId,@Body Assignment assignment);
     @POST("auth/otp")
     Call<Map<String,String>> getOtp(@Body Map<String,String> email);
     @POST("auth/forgotPassword")
@@ -91,4 +93,12 @@ public interface Service {
     Call<Category> editCategory(@Path("prefix")String prefix,@Body Category category);
     @DELETE("category/{prefix}")
     Call<Void> deleteCategory(@Path("prefix")String prefix);
+    @POST("request-assign")
+    Call<AssignRequestRespone> createAssignRequest(@Body AssignRequestEntity assignRequestEntity);
+    @GET("request-assign")
+    Call<List<AssignRequestRespone>> getAllAssignRequest();
+    @PUT("request-assign/{id}")
+    Call<AssignRequestRespone> acceptedAssignRequest(@Path("id") Integer id,@Body AssignRequestRespone assignRequestRespone);
+    @DELETE("request-assign/{id}")
+    Call<Void> deleteAssignRequest(@Path("id") Integer id);
 }

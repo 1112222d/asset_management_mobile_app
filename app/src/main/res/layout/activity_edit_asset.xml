@@ -35,14 +35,15 @@
                     android:layout_weight="1"
                     android:gravity="center_horizontal|center_vertical"
                     android:src="@drawable/ic_arrow_back" />
+
                 <ImageView
-                    android:visibility="invisible"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal|center_vertical"
-                    android:src="@drawable/ic_arrow_back" />
+                    android:src="@drawable/ic_arrow_back"
+                    android:visibility="invisible" />
 
                 <TextView
                     android:id="@+id/logo_nguon"
@@ -62,6 +63,7 @@
                     android:layout_weight="1"
                     android:gravity="center_horizontal|center_vertical"
                     android:src="@drawable/ic_editwhite" />
+
                 <ImageView
                     android:id="@+id/history"
                     android:layout_width="0dp"
@@ -88,6 +90,7 @@
                     android:text="Edit Asset"
                     android:textColor="@color/white"
                     android:textSize="32sp" />
+
                 <TextView
                     android:id="@+id/idAssetEdit"
                     android:layout_width="match_parent"
@@ -100,6 +103,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
+
                 <TextView
                     android:id="@+id/tv_cateEdit"
                     android:layout_width="match_parent"
@@ -184,6 +188,7 @@
                                     android:background="@null"
                                     android:gravity="end"
                                     android:hint="Name"
+                                    android:maxLength="20"
                                     android:textAlignment="viewEnd"
                                     android:textColor="#5b5b5b"
                                     android:textSize="18sp" />
@@ -257,8 +262,8 @@
                                     android:background="@null"
                                     android:gravity="end"
                                     android:hint="Specification"
-
                                     android:lines="3"
+                                    android:maxLength="255"
                                     android:textAlignment="viewEnd"
                                     android:textColor="#5b5b5b"
                                     android:textSize="18sp" />
@@ -365,6 +370,7 @@
             </ScrollView>
         </LinearLayout>
     </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/prgrsbarEditAsset"
         android:layout_width="wrap_content"

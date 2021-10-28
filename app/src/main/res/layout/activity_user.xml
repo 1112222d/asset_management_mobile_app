@@ -82,16 +82,18 @@
             android:paddingBottom="24dp">
 
             <LinearLayout
-                android:id="@+id/myAssignment"
+
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
 
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="120dp"
+                    android:id="@+id/myAssignment"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:background="@drawable/bg_green"
@@ -102,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="12dp"
                         android:layout_marginTop="12dp"
-
+                        android:layout_marginRight="12dp"
                         android:src="@drawable/house" />
 
                     <TextView
@@ -112,8 +114,38 @@
                         android:layout_marginLeft="12dp"
                         android:layout_marginTop="16dp"
                         android:text="My Assignment"
+                        android:layout_marginRight="12dp"
                         android:textColor="#FFF" />
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:id="@+id/myAssignRequest"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/bg_orange_status"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="12dp"
+                        android:src="@drawable/house" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:gravity="center_horizontal"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="16dp"
+                        android:text="My Assign Request"
+                        android:layout_marginRight="12dp"
+                        android:textColor="#FFF" />
+                </LinearLayout>
+
             </LinearLayout>
 
 <!--            <LinearLayout-->

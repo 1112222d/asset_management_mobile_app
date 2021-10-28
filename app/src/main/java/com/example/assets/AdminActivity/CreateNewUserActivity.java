@@ -31,6 +31,8 @@ import com.example.assets.Utils.VNCharacterUtils;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -87,28 +89,36 @@ public class CreateNewUserActivity extends AppCompatActivity implements PopupMen
         InputFilter filter = new InputFilter() {
             public CharSequence filter(CharSequence source, int start, int end,
                                        Spanned dest, int dstart, int dend) {
-                for (int i = start; i < end; i++) {
-                    if (Character.isWhitespace(source.charAt(i))) {
-                        return "";
-                    }
-                }
-                return null;
-            }
 
+                    for (int i = start; i < end; i++) {
+                        if (Character.isWhitespace(source.charAt(i)) || Character.isDigit(source.charAt(i))) {
+                            return source.subSequence(start, end-1);
+                        }
+                    }
+                    if(source.length()>20)
+                    {
+                        return source.subSequence(0,20);
+                    }else
+            return null;
+            }
         };
         InputFilter filter2 = new InputFilter() {
             public CharSequence filter(CharSequence source, int start, int end,
                                        Spanned dest, int dstart, int dend) {
 
-                System.out.println(source);
+
                 int number= Arrays.asList(lastname.getText().toString().split(" ")).size();
                 System.out.println(number);
                 for (int i = start; i < end; i++) {
-                    if (Character.isWhitespace(source.charAt(i))&&number>6) {
-                        return "";
+                    if ((Character.isWhitespace(source.charAt(i))|| Character.isDigit(source.charAt(i)))&&number>6) {
+                        return source.subSequence(start, end-1);
                     }
                 }
-                return null;
+                if(source.length()>100)
+                {
+                    return source.subSequence(0,100);
+                }else
+                    return null;
             }
 
         };
@@ -175,8 +185,17 @@ public class CreateNewUserActivity extends AppCompatActivity implements PopupMen
                     public void onResponse(Call<User> call, Response<User> response) {
                         progress.setVisibility(View.INVISIBLE);
                         if (response.code() == 201) {
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                            SimpleDateFormat formatter2 = new SimpleDateFormat("ddMMyyyy");
+                            Date date = null;
+                            try {
+                                date = formatter.parse(response.body().getDateOfBirth());
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
                             MessageDialog.getInstance(CreateNewUserActivity.this, "Success",
-                                    "Create user success").setPositiveButton("OK", (dialog, which) -> {
+                                    "Create user success\nYour Username: "+response.body().getUsername()+"\nPassword: "+response.body().getUsername()+"@"+formatter2.format(date)).setPositiveButton("OK", (dialog, which) -> {
                                 UserManagementActivity.userNew=response.body();
                                         finish();
                             }).show();

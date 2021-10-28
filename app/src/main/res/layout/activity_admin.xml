@@ -64,7 +64,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="330dp"
+        android:layout_height="380dp"
         android:background="@drawable/bg_menu"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -112,6 +112,7 @@
                         android:textColor="#FFF" />
                 </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/assetManagement"
                 android:layout_width="0dp"
@@ -222,7 +223,7 @@
             android:orientation="horizontal"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:paddingBottom="26dp">
+            >
 
 
 
@@ -243,11 +244,12 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_marginLeft="12dp"
                         android:layout_marginTop="12dp"
-                        android:src="@drawable/checked" />
+
+                        android:src="@drawable/ic_refresh_white" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -258,7 +260,38 @@
                         android:textColor="#FFF" />
                 </LinearLayout>
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
 
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/assignRequest"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/bg_orange_status"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/checked" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="16dp"
+                        android:text="Request for \nAssigning"
+                        android:textColor="#FFF" />
+                </LinearLayout>
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -293,37 +326,40 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:id="@+id/logout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:background="@drawable/bg_red"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
-                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="12dp"
+                    android:src="@drawable/ic_baseline_login_24" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp"
+                    android:gravity="center_horizontal|center_vertical"
 
-                <LinearLayout
-                    android:id="@+id/logout"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@drawable/bg_red"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginTop="12dp"
-                        android:src="@drawable/ic_baseline_login_24" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginTop="16dp"
-                        android:text="Log out"
-                        android:textColor="#FFF" />
-                </LinearLayout>
+                    android:text="Logout"
+                    android:textColor="#FFF" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

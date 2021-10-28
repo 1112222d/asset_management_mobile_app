@@ -127,6 +127,7 @@ public class RequestActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onResume() {
         super.onResume();

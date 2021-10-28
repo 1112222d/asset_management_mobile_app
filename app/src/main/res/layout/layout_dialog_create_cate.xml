@@ -20,6 +20,7 @@
             android:background="@android:color/transparent"
             android:drawablePadding="12dp"
             android:hint="Name category"
+            android:maxLength="15"
             android:imeOptions="actionNext"
             android:minWidth="320dp"
             android:minHeight="50dp"
@@ -43,6 +44,7 @@
 
             android:drawablePadding="12dp"
             android:hint="Prefix"
+            android:maxLength="2"
             android:imeOptions="actionNext"
             android:minWidth="320dp"
             android:minHeight="50dp"

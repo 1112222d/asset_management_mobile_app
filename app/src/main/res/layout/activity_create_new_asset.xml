@@ -157,6 +157,7 @@
                                     android:background="@null"
                                     android:gravity="end"
                                     android:hint="Name"
+                                    android:maxLength="20"
                                     android:textAlignment="viewEnd"
                                     android:textColor="#5b5b5b"
                                     android:textSize="18sp" />
@@ -230,8 +231,8 @@
                                     android:background="@null"
                                     android:gravity="end"
                                     android:hint="Specification"
-
                                     android:lines="3"
+                                    android:maxLength="255"
                                     android:textAlignment="viewEnd"
                                     android:textColor="#5b5b5b"
                                     android:textSize="18sp" />
@@ -329,6 +330,7 @@
             </ScrollView>
         </LinearLayout>
     </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/prgrsbarAsset"
         android:layout_width="wrap_content"

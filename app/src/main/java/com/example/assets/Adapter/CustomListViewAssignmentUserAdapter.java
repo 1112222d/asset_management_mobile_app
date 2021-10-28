@@ -1,12 +1,17 @@
 package com.example.assets.Adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,8 +20,10 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 
 import com.example.assets.AdminActivity.AssetManagementActivity;
+import com.example.assets.AdminActivity.ViewAssignActivity;
 import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
+import com.example.assets.Model.AssignRequestRespone;
 import com.example.assets.Model.Assignment;
 import com.example.assets.Model.Request;
 import com.example.assets.R;
@@ -115,17 +122,16 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (assignment.getState().equals("WAITING_FOR_ACCEPTANCE")) {
+                    assignment.setState("ACCEPTED");
                     MessageDialog.getInstance(parent.getContext(), "Are you sure?",
                             "Do you want accept this assignment?").setPositiveButton("Appept", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.service.changeStateStaffAssignment(assignment.getId(), "accept").enqueue(new Callback<Assignment>() {
-
+                            MainActivity.service.changeStateStaffAssignment(assignment.getId(), assignment).enqueue(new Callback<Assignment>() {
                                 @Override
                                 public void onResponse(Call<Assignment> call, Response<Assignment> response) {
                                     if (response.code() == 200) {
                                         Toast.makeText(parent.getContext(), "Success", Toast.LENGTH_SHORT).show();
-                                        assignment.setState("ACCEPTED");
                                         notifyDataSetChanged();
                                     }
                                 }
@@ -143,29 +149,78 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
         holder.cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Dialog dialog2;
                 if (assignment.getState().equals("WAITING_FOR_ACCEPTANCE")) {
-                MessageDialog.getInstance(parent.getContext(), "Are you sure?",
-                        "Do you want decline this assignment?").setPositiveButton("Decline", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        MainActivity.service.changeStateStaffAssignment(assignment.getId(), "declined").enqueue(new Callback<Assignment>() {
-                            @RequiresApi(api = Build.VERSION_CODES.N)
-                            @Override
-                            public void onResponse(Call<Assignment> call, Response<Assignment> response) {
-                                if (response.code() == 200) {
-                                    Toast.makeText(parent.getContext(), "Success", Toast.LENGTH_SHORT).show();
-                                    assignments.remove(assignment);
-                                    notifyDataSetChanged();
-                                }
-                            }
+                    dialog2= new Dialog(parent.getContext());
+                    dialog2.setContentView(R.layout.layout_dialog_decline);
+                    dialog2.getWindow().setLayout(1050,1800);
+                    dialog2.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    EditText reason;
+                    Button ok, decline;
+                    reason=dialog2.findViewById(R.id.decline_note);
+                    ok=dialog2.findViewById(R.id.btn_ok);
+                    decline=dialog2.findViewById(R.id.btn_decline);
+                    dialog2.show();
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            assignment.setState("CANCELED_ASSIGN");
+                            assignment.setNote(reason.getText().toString());
+                            MainActivity.service.changeStateStaffAssignment(assignment.getId(),assignment).enqueue(new Callback<Assignment>() {
+                                @Override
+                                public void onResponse(Call<Assignment> call, Response<Assignment> response) {
+                                    if(response.code()==200)
+                                    {
+                                        MessageDialog.getInstance(parent.getContext(), "Success","Decline success").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog2.dismiss();
+                                            }
+                                        }).show();
 
-                            @Override
-                            public void onFailure(Call<Assignment> call, Throwable t) {
-                                MessageDialog.getInstance(parent.getContext(), "Error", "Something went wrong").show();
-                            }
-                        });
-                    }
-                }).setNegativeButton("Cancel",null).show();
+                                    }else
+                                    {
+                                        MessageDialog.getInstance(parent.getContext(),"Error","Decline Fail").show();
+
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Assignment> call, Throwable t) {
+                                    MessageDialog.getInstance(parent.getContext(),"Error","Decline Fail").show();
+
+                                }
+                            });
+                        }
+                    });
+                    decline.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog2.dismiss();
+                        }
+                    });
+//                MessageDialog.getInstance(parent.getContext(), "Are you sure?",
+//                        "Do you want decline this assignment?").setPositiveButton("Decline", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        MainActivity.service.changeStateStaffAssignment(assignment.getId(), "declined").enqueue(new Callback<Assignment>() {
+//                            @RequiresApi(api = Build.VERSION_CODES.N)
+//                            @Override
+//                            public void onResponse(Call<Assignment> call, Response<Assignment> response) {
+//                                if (response.code() == 200) {
+//                                    Toast.makeText(parent.getContext(), "Success", Toast.LENGTH_SHORT).show();
+//                                    assignments.remove(assignment);
+//                                    notifyDataSetChanged();
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<Assignment> call, Throwable t) {
+//                                MessageDialog.getInstance(parent.getContext(), "Error", "Something went wrong").show();
+//                            }
+//                        });
+//                    }
+//                }).setNegativeButton("Cancel",null).show();
             }}
         });
         holder.refresh.setOnClickListener(new View.OnClickListener() {

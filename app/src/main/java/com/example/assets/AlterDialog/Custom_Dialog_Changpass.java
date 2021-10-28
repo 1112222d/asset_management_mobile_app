@@ -60,7 +60,10 @@ public class Custom_Dialog_Changpass extends AppCompatDialogFragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(oldPassword.getText().toString().equals(newPassword.getText().toString()))
+                    if(oldPassword.getText().toString().trim().equals("")||newPassword.getText().toString().trim().equals(""))
+                    {
+                        Toast.makeText(view.getContext(), "Please enter all data fields", Toast.LENGTH_SHORT).show();
+                    }else if(oldPassword.getText().toString().equals(newPassword.getText().toString()))
                     {
                         Toast.makeText(view.getContext(), "New and old password must be different", Toast.LENGTH_SHORT).show();
                     }else {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AssetsManager</string>
+    <string name="app_name">Online Assignment</string>
     <string name="hint_username">Username</string>
     <string name="hint_password">Password</string>
     <string name="text_forgot_password">Forgot password? No worries</string>
