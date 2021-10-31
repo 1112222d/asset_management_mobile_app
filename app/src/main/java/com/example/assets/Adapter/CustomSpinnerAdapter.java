@@ -61,7 +61,7 @@ public class CustomSpinnerAdapter extends BaseAdapter {
         return 0;
     }
     private class ViewHolder {
-        TextView cateName, prefix;
+        TextView name, prefix;
         ImageView edit,cancel;
     }
     @SuppressLint("ViewHolder")
@@ -70,11 +70,11 @@ public class CustomSpinnerAdapter extends BaseAdapter {
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
         Category cate = (Category) getItem(position);
         ViewHolder holder = new ViewHolder();
-        holder.cateName=convertView.findViewById(R.id.cateName);
+        holder.name=convertView.findViewById(R.id.tv_name);
         holder.prefix=convertView.findViewById(R.id.tv_prefix);
         holder.edit=convertView.findViewById(R.id.edit);
         holder.cancel=convertView.findViewById(R.id.cancel);
-        holder.cateName.setText(cate.getName());
+        holder.name.setText(cate.getName());
         holder.prefix.setText(cate.getPrefix());
         if(position==categories.size()-1)
         {
@@ -85,45 +85,14 @@ public class CustomSpinnerAdapter extends BaseAdapter {
             holder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Edit_Category_Dialog custom_dialog = new Edit_Category_Dialog(categories,cate);
-                    custom_dialog.show(fm, "Create category");
+
                 }
             });
             holder.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    MessageDialog.getInstance(context,"Are you sure?","Are you want to delete this category ?").setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.service.deleteCategory(cate.getPrefix()).enqueue(new Callback<Void>() {
-                                @RequiresApi(api = Build.VERSION_CODES.N)
-                                @Override
-                                public void onResponse(Call<Void> call, Response<Void> response) {
-                                    if(response.code()==409)
-                                    {
-                                        MessageDialog.getInstance(context,"Error","Asset is available in category!").show();
 
-                                    }
-                                    if(response.code()==200)
-                                    {
-                                        List<Category> temp=categories.stream().filter(x->!x.getPrefix().equals(cate.getPrefix())).collect(Collectors.toList());
-                                        categories.clear();
-                                        categories.addAll(temp);
-                                        notifyDataSetChanged();
-                                        MessageDialog.getInstance(context,"Success","Delete category success").show();
-                                        CreateNewAssetActivity.cateSelect=new Category();
-                                        EditAssetActivity.cateSelect=new Category();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Void> call, Throwable t) {
-
-                                }
-                            });
-                        }
-                    }).setNegativeButton("NO",null).show();
                 }
             });
         }

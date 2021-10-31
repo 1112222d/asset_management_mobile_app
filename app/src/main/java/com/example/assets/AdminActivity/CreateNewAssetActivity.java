@@ -1,7 +1,13 @@
 package com.example.assets.AdminActivity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,19 +21,24 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.assets.Adapter.CustomListViewCategoryAdapter;
+import com.example.assets.Adapter.CustomListViewDepartmentAdapter;
 import com.example.assets.Adapter.CustomSpinnerAdapter;
 import com.example.assets.AlterDialog.Category_Dialog;
 import com.example.assets.AlterDialog.Custom_Dialog;
+import com.example.assets.AlterDialog.Edit_Category_Dialog;
 import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
 import com.example.assets.Model.Category;
+import com.example.assets.Model.Department;
 import com.example.assets.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
@@ -35,18 +46,19 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CreateNewAssetActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
-
     EditText editName, editSepc;
     TextView name, category, installDate, editInstallDate, state;
-    Spinner edCate;
-    public static CustomSpinnerAdapter customSpinnerAdapter;
     List<Category> categories;
+    TextView edCate;
+    Dialog dialog;
+    public static CustomListViewCategoryAdapter customListViewCategoryAdapter;
 
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
     MaterialDatePicker materialDatePicker;
@@ -77,7 +89,7 @@ public class CreateNewAssetActivity extends AppCompatActivity implements PopupMe
         edCate=findViewById(R.id.ed_cate);
 
         categories= new ArrayList<>();
-        customSpinnerAdapter=new CustomSpinnerAdapter(categories,CreateNewAssetActivity.this);
+        customListViewCategoryAdapter=new CustomListViewCategoryAdapter(CreateNewAssetActivity.this,categories);
         cateSelect=new Category();
         button = findViewById(R.id.button_createAsset);
         progress=findViewById(R.id.prgrsbarAsset);
@@ -137,27 +149,96 @@ public class CreateNewAssetActivity extends AppCompatActivity implements PopupMe
                 progress.setVisibility(View.INVISIBLE);
             }
         });
-        edCate.setAdapter(customSpinnerAdapter);
-        edCate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        edCate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(customSpinnerAdapter.getCount()-1==position)
-                {
-                    openDialog();
+            public void onClick(View view) {
+                dialog = new Dialog(CreateNewAssetActivity.this);
+                dialog.setContentView(R.layout.dialog_department_spinner);
+                dialog.getWindow().setLayout(800, 1800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+                TextView title =dialog.findViewById(R.id.title);
+                ListView listView = dialog.findViewById(R.id.listView);
+                Button button = dialog.findViewById(R.id.create);
+                title.setText("Choose Category");
+                listView.setAdapter(customListViewCategoryAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        cateSelect = (Category) customListViewCategoryAdapter.getItem(position);
+                        Toast.makeText(CreateNewAssetActivity.this, "" + cateSelect.getName()+" "+cateSelect.getPrefix(), Toast.LENGTH_SHORT).show();
+                        edCate.setText(cateSelect.getName());
+                        dialog.dismiss();
+                    }
+                });
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        PopupMenu popup = new PopupMenu(view.getContext(), view);
+                        popup.inflate(R.menu.longclick);
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                Category category =(Category)customListViewCategoryAdapter.getItem(i);
+                                switch (item.getItemId()) {
+                                    case R.id.edit: {
+                                        Edit_Category_Dialog custom_dialog = new Edit_Category_Dialog(categories,category);
+                                        custom_dialog.show(getSupportFragmentManager(), "Create category");
+                                        return true;
+                                    }
+                                    case R.id.delete: {
+                                        MessageDialog.getInstance(CreateNewAssetActivity.this,"Are you sure?","Are you want to delete this category ("+category.getPrefix()+" "+category.getName()+") ?").setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                MainActivity.service.deleteCategory(category.getPrefix()).enqueue(new Callback<Void>() {
+                                                    @RequiresApi(api = Build.VERSION_CODES.N)
+                                                    @Override
+                                                    public void onResponse(Call<Void> call, Response<Void> response) {
+                                                        if(response.code()==409)
+                                                        {
+                                                            MessageDialog.getInstance(CreateNewAssetActivity.this,"Error","Asset is available in category!").show();
 
-                }else
-                {
-                    cateSelect=(Category)customSpinnerAdapter.getItem(position);
-                    category.setText("CATEGORY: "+cateSelect.getName());
+                                                        }
+                                                        if(response.code()==200)
+                                                        {
+                                                            List<Category> temp=categories.stream().filter(x->!x.getPrefix().equals(category.getPrefix())).collect(Collectors.toList());
+                                                            categories.clear();
+                                                            categories.addAll(temp);
+                                                            customListViewCategoryAdapter.notifyDataSetChanged();
+                                                            MessageDialog.getInstance(CreateNewAssetActivity.this,"Success","Delete category success").show();
+                                                            CreateNewAssetActivity.cateSelect=new Category();
+                                                            EditAssetActivity.cateSelect=new Category();
+                                                        }
+                                                    }
 
-                }
+                                                    @Override
+                                                    public void onFailure(Call<Void> call, Throwable t) {
 
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+                                                    }
+                                                });
+                                            }
+                                        }).setNegativeButton("NO",null).show();
+                                        return true;
+                                    }
+                                    default:
+                                        return false;
+                                }
+                            }
+                        });
+                        popup.show();
+                        return true;
+                    }
+                });
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openDialog();
+                    }
+                });
+//                category.setText("CATEGORY: "+cateSelect.getName());
             }
         });
+
 
         editName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -213,9 +294,8 @@ public class CreateNewAssetActivity extends AppCompatActivity implements PopupMe
                 {
                     categories.clear();
                     categories.addAll(response.body());
-                    categories.add(new Category("Create new",""));
-                    customSpinnerAdapter.notifyDataSetChanged();
-                    edCate.setSelection(0);
+                    customListViewCategoryAdapter.notifyDataSetChanged();
+                    edCate.setText(categories.get(0).getName());
                     cateSelect= categories.get(0);
                 }
             }

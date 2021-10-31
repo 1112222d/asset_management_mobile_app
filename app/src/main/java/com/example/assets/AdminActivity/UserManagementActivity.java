@@ -115,7 +115,7 @@ public class UserManagementActivity extends AppCompatActivity {
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 PopupMenu popup = new PopupMenu(view.getContext(), view);
                 popup.inflate(R.menu.longclick);
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -123,11 +123,11 @@ public class UserManagementActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.edit: {
-                                editUser((User) customListViewUserAdapter.getItem(position));
+                                editUser((User) customListViewUserAdapter.getItem(i));
                                 return true;
                             }
                             case R.id.delete: {
-                                deleteUser((User) customListViewUserAdapter.getItem(position));
+                                deleteUser((User) customListViewUserAdapter.getItem(i));
                                 return true;
                             }
                             default:

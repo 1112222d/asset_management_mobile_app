@@ -10,12 +10,13 @@ public class UserRequest {
     private String joinedDate;
     private String type;
     private String email;
+    private String deptCode;
 
 
     public UserRequest() {
     }
 
-    public UserRequest(String firstName, String lastName, Gender gender, String dateOfBirth, String joinedDate, String type,String email) {
+    public UserRequest(String firstName, String lastName, Gender gender, String dateOfBirth, String joinedDate, String type,String email,String deptCode) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -23,6 +24,7 @@ public class UserRequest {
         this.joinedDate = joinedDate;
         this.type = type;
         this.email=email;
+        this.deptCode=deptCode;
     }
 
     public String getType() {
@@ -79,5 +81,13 @@ public class UserRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getDeptCode() {
+        return deptCode;
+    }
+
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
     }
 }

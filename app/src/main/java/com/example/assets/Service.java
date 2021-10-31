@@ -6,6 +6,7 @@ import com.example.assets.Model.AssignRequestRespone;
 import com.example.assets.Model.Assignment;
 import com.example.assets.Model.Category;
 import com.example.assets.Model.ChangePasswordRequest;
+import com.example.assets.Model.Department;
 import com.example.assets.Model.LoginRequest;
 import com.example.assets.Model.LoginResponse;
 import com.example.assets.Model.Report;
@@ -101,4 +102,6 @@ public interface Service {
     Call<AssignRequestRespone> acceptedAssignRequest(@Path("id") Integer id,@Body AssignRequestRespone assignRequestRespone);
     @DELETE("request-assign/{id}")
     Call<Void> deleteAssignRequest(@Path("id") Integer id);
+    @GET("department")
+    Call<List<Department>> getAllDepart();
 }

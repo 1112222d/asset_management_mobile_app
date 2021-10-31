@@ -63,8 +63,7 @@ public class Category_Dialog extends AppCompatDialogFragment {
                 {
                     categories.clear();
                     categories.addAll(response.body());
-                    categories.add(new Category("Create new category",""));
-                    CreateNewAssetActivity.customSpinnerAdapter.notifyDataSetChanged();
+                    CreateNewAssetActivity.customListViewCategoryAdapter.notifyDataSetChanged();
                 }
             }
 

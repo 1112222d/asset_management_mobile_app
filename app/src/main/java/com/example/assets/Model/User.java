@@ -39,6 +39,12 @@ public class User  implements Serializable {
     @SerializedName("state")
     @Expose
     private String state;
+    @SerializedName("deptCode")
+    @Expose
+    private String deptCode;
+    @SerializedName("deptName")
+    @Expose
+    private String deptName;
     @SerializedName("firstLogin")
     @Expose
     private Boolean firstLogin;
@@ -150,4 +156,19 @@ public class User  implements Serializable {
         this.firstLogin = firstLogin;
     }
 
+    public String getDeptCode() {
+        return deptCode;
+    }
+
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
 }

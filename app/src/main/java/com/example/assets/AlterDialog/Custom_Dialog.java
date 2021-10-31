@@ -45,7 +45,6 @@ public class Custom_Dialog extends AppCompatDialogFragment {
             }
         });
 
-
         return builder.create();
     }
     @Override
