@@ -51,7 +51,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CreateNewAssignActivity extends AppCompatActivity {
-    TextView nameCate, tv_assignedDate, tv_cate_name;
+    TextView nameCate, tv_assignedDate;
     Spinner ed_cate;
     EditText ed_note;
     CustomSpinnerAssignRequestAdapter customSpinnerAssignRequestAdapter;
@@ -70,7 +70,7 @@ public class CreateNewAssignActivity extends AppCompatActivity {
         button_createAssign = findViewById(R.id.button_createAssign);
         customSpinnerAssignRequestAdapter = new CustomSpinnerAssignRequestAdapter(categories, CreateNewAssignActivity.this);
         ed_cate.setAdapter(customSpinnerAssignRequestAdapter);
-        tv_cate_name = findViewById(R.id.tv_asset);
+
         tv_assignedDate.setText("Date: " + DateFormat.format("dd/MM/yyyy", new Date()).toString());
 
         loadCate();
@@ -79,7 +79,6 @@ public class CreateNewAssignActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 cateSelect = (Category) customSpinnerAssignRequestAdapter.getItem(position);
-                tv_cate_name.setText("CATEGORY: " + cateSelect.getName());
 
             }
 
@@ -128,7 +127,6 @@ public class CreateNewAssignActivity extends AppCompatActivity {
                     customSpinnerAssignRequestAdapter.notifyDataSetChanged();
                     ed_cate.setSelection(0);
                     cateSelect = (Category) customSpinnerAssignRequestAdapter.getItem(0);
-                    tv_cate_name.setText("CATEGORY: " + cateSelect.getName());
                 }
             }
 
