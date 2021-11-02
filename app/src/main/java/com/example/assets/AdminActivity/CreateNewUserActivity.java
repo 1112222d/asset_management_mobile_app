@@ -192,7 +192,6 @@ public class CreateNewUserActivity extends AppCompatActivity implements PopupMen
                 checkInput();
             }
         });
-
         edDepartment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

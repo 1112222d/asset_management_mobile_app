@@ -3,7 +3,10 @@ package com.example.assets.AdminActivity;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,17 +14,21 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.assets.Adapter.CustomListViewDepartmentAdapter;
 import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
+import com.example.assets.Model.Department;
 import com.example.assets.Model.Gender;
 import com.example.assets.Model.User;
 import com.example.assets.Model.UserRequest;
@@ -36,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,6 +61,11 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
     TextView tv_name, gender, dob, type, joindate, ed_joindate,id_user_edit;
     Button button,delete;
     long dateJoin, dateOB;
+    TextView edDepartment;
+    Dialog dialog;
+    Department deptSelect;
+    public CustomListViewDepartmentAdapter customListViewDepartmentAdapter;
+    List<Department> departments;
     RelativeLayout progress;
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
     MaterialDatePicker materialDatePicker;
@@ -80,18 +93,28 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
         back = findViewById(R.id.backCreateUserEdit);
         editIcon = findViewById(R.id.editAssetIcon);
         id_user_edit=findViewById(R.id.id_user_edit);
-        back.setOnClickListener(v -> finish());
+        delete=findViewById(R.id.button_UserDelete);
+        ed_email=findViewById(R.id.ed_email);
+        edDepartment =findViewById(R.id.ed_depart);
+        departments=new ArrayList<>();
+        customListViewDepartmentAdapter= new CustomListViewDepartmentAdapter(EditUserActivity.this,departments);
+
         Intent intent = getIntent();
         user = (User) intent.getSerializableExtra("user");
 
-        delete=findViewById(R.id.button_UserDelete);
+        firstname.setEnabled(false);
+        lastname.setEnabled(false);
+        checkDelete(user.getStaffCode());
+
+        setStatus(status);
+        setData(user);
         delete.setOnClickListener(v -> {
             MainActivity.service.canDisableUser(user.getStaffCode()).enqueue(new Callback<Boolean>() {
                 @Override
                 public void onResponse(Call<Boolean> call, Response<Boolean> response) {
                     if(response.code()==200)
                     {
-                       disableUser(user);
+                        disableUser(user);
                     }else
                     {
                         if(response.code()==202)
@@ -105,7 +128,7 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
                                         "There are valid assignments belonging to user.\n Please close all assignments before disabling user").setPositiveButton("OK", (dialog, which) -> {
                                 }).show();
                             }else
-                            MessageDialog.getInstance(EditUserActivity.this,"Error","Something went wrong").show();
+                                MessageDialog.getInstance(EditUserActivity.this,"Error","Something went wrong").show();
                         }
                     }
                 }
@@ -116,12 +139,7 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
                 }
             });
         });
-        firstname.setEnabled(false);
-        lastname.setEnabled(false);
-        ed_email=findViewById(R.id.ed_email);
-        checkDelete(user.getStaffCode());
-        setStatus(status);
-        setData(user);
+        back.setOnClickListener(v -> finish());
         editIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -223,13 +241,14 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
                 request.setGender(genderTemp);
                 request.setType(type.getText().toString());
                 request.setEmail(ed_email.getText().toString());
+                request.setDeptCode(deptSelect.getDeptCode());
                 MainActivity.service.updateUser(request, user.getStaffCode()).enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
                         progress.setVisibility(View.INVISIBLE);
                         if (response.code() == 200) {
                             MessageDialog.getInstance(EditUserActivity.this, "Success",
-                                    "Create user success").setPositiveButton("OK", (dialog, which) -> {
+                                    "Update user success").setPositiveButton("OK", (dialog, which) -> {
                                 finish();
                             }).show();
                         } else {
@@ -302,6 +321,65 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
             public void onFocusChange(View v, boolean hasFocus) {
 
                 checkInput();
+            }
+        });
+        edDepartment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog = new Dialog(EditUserActivity.this);
+                dialog.setContentView(R.layout.dialog_department_spinner);
+                dialog.getWindow().setLayout(800, 1800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+                TextView title =dialog.findViewById(R.id.title);
+                ListView listView = dialog.findViewById(R.id.listView);
+                Button button = dialog.findViewById(R.id.create);
+                title.setText("Choose Department");
+                listView.setAdapter(customListViewDepartmentAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        deptSelect = (Department) customListViewDepartmentAdapter.getItem(position);
+                        Toast.makeText(EditUserActivity.this, "" + deptSelect.getDeptCode(), Toast.LENGTH_SHORT).show();
+                        edDepartment.setText(deptSelect.getName());
+                        dialog.dismiss();
+                    }
+                });
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        PopupMenu popup = new PopupMenu(view.getContext(), view);
+                        popup.inflate(R.menu.longclick);
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                Department department =(Department)customListViewDepartmentAdapter.getItem(i);
+                                switch (item.getItemId()) {
+                                    case R.id.edit: {
+//                                editUser((Department) customDepartmentSpinnerAdapter.getItem(i));
+                                        Toast.makeText(EditUserActivity.this, "Edit" + department.getDeptCode(), Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    }
+                                    case R.id.delete: {
+//                                deleteUser((Department) customDepartmentSpinnerAdapter.getItem(i));
+                                        Toast.makeText(EditUserActivity.this, "Delete" +department.getDeptCode(), Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    }
+                                    default:
+                                        return false;
+                                }
+                            }
+                        });
+                        popup.show();
+                        return true;
+                    }
+                });
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(EditUserActivity.this, "Create new", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -430,6 +508,8 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
         type.setText(data.getType().equals("ROLE_ADMIN") ? "Admin" : "Staff");
         joindate.setText(data.getJoinedDate());
         ed_joindate.setText(data.getJoinedDate());
+        edDepartment.setText(data.getDeptName());
+        deptSelect= new Department(data.getDeptCode(),data.getDeptName());
         List<String> temp= Arrays.asList(data.getDateOfBirth().split("/"));
         calendar.set(Integer.parseInt(temp.get(2)),Integer.parseInt(temp.get(1))-1,Integer.parseInt(temp.get(0)));
         dateOB=calendar.getTimeInMillis();
@@ -443,6 +523,7 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
     private void setStatus(Boolean status) {
         ed_email.setEnabled(status);
         button.setEnabled(status);
+        edDepartment.setEnabled(status);
     }
 
     private void disableUser(User user) {
@@ -534,5 +615,29 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
 
             }
         });
+    }
+    private void loadDepart(){
+        MainActivity.service.getAllDepart().enqueue(new Callback<List<Department>>() {
+            @Override
+            public void onResponse(Call<List<Department>> call, Response<List<Department>> response) {
+                if(response.code()==200)
+                {
+                    departments.clear();
+                    departments.addAll(response.body());
+                    customListViewDepartmentAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Department>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadDepart();
     }
 }
