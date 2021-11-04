@@ -104,4 +104,6 @@ public interface Service {
     Call<Void> deleteAssignRequest(@Path("id") Integer id);
     @GET("department")
     Call<List<Department>> getAllDepart();
+    @GET("category/{prefix}")
+    Call<Integer> getSumOfAvailableAssetByCategory(@Path("prefix") String prefix,@Query("endDate")String endDate,@Query("startDate")String startDate);
 }

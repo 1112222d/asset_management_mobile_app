@@ -101,7 +101,7 @@
                 android:layout_height="match_parent"></ListView>
         </LinearLayout>
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4">
@@ -231,7 +231,32 @@
                                         android:textSize="18sp" />
                                 </RelativeLayout>
                             </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="10dp"
+                                >
+                                <TextView
 
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:text="Available number: "
+                                    android:textColor="#4CAF50"
+                                    android:textSize="18sp" />
+                                <TextView
+                                    android:id="@+id/tv_available"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:gravity="end"
+                                    android:text="0"
+                                    android:textAlignment="viewEnd"
+                                    android:textColor="#4CAF50"
+                                    android:textSize="18sp" />
+                            </LinearLayout>
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -316,7 +341,7 @@
                         android:text="Create" />
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
     <RelativeLayout
