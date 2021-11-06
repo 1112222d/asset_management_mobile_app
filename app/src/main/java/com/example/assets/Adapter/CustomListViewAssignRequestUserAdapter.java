@@ -56,7 +56,7 @@ public class CustomListViewAssignRequestUserAdapter extends BaseAdapter {
 
 
     private class ViewHolder {
-        TextView category,idAssignment;
+        TextView idAssignment;
         TextView state, date;
     }
 
@@ -69,12 +69,10 @@ public class CustomListViewAssignRequestUserAdapter extends BaseAdapter {
         holder = new ViewHolder();
 
         holder.idAssignment=convertView.findViewById(R.id.idAssignment);
-        holder.category = convertView.findViewById(R.id.nameAsset);
         holder.state = convertView.findViewById(R.id.stateAssign);
         holder.date = convertView.findViewById(R.id.dateAssign);
 
         holder.state = convertView.findViewById(R.id.stateAssign);
-        holder.category.setText(assignment.getCategory());
         holder.state.setText(state(assignment.getState()));
         holder.date.setText(assignment.getRequestedDate());
         holder.idAssignment.setText(assignment.getId().toString());

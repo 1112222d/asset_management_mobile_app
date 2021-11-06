@@ -142,7 +142,7 @@ public class RequestForAssigning extends AppCompatActivity {
         if(!key.equals(""))
         {
             listShowAssignment.addAll(listDataAssignment.stream().filter(x->{
-                return x.getRequestedBy().toLowerCase().contains(key.toLowerCase())||x.getCategory().toLowerCase().contains(key.toLowerCase())||x.getPrefix().toLowerCase().contains(key.toLowerCase())||x.getId().toString().toLowerCase().contains(key.toLowerCase());
+                return x.getRequestedBy().toLowerCase().contains(key.toLowerCase())||x.getId().toString().toLowerCase().contains(key.toLowerCase());
             }).collect(Collectors.toList()));
             listFilterAssignment.addAll(filter(listShowAssignment,item_select));
             sort();

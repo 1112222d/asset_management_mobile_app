@@ -249,12 +249,12 @@ public class CreateNewAssignmentAccepctActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<Asset>> call, Response<List<Asset>> response) {
-                if (response.code() == 200) {
-                    assets.addAll(response.body());
-                    listSearchAsset.addAll(response.body().stream().filter(x -> {
-                        return x.getState().equals("AVAILABLE")&&x.getCategoryPrefix().equals(assignRequestRespone.getPrefix());
-                    }).collect(Collectors.toList()));
-                }
+//                if (response.code() == 200) {
+//                    assets.addAll(response.body());
+//                    listSearchAsset.addAll(response.body().stream().filter(x -> {
+//                        return x.getState().equals("AVAILABLE")&&x.getCategoryPrefix().equals(assignRequestRespone.getPrefix());
+//                    }).collect(Collectors.toList()));
+//                }
             }
 
             @Override

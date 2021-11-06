@@ -144,16 +144,7 @@ public class ViewAssignActivity extends AppCompatActivity {
         index.set(0);
         ed_note.setEnabled(false);
         ed_cate.setEnabled(false);
-        categories.stream().forEach(x -> {
-            if (x.getPrefix().equals(data.getPrefix())) {
-                ed_cate.setSelection(index.get());
-                cateSelect = categories.get(index.get());
-                tv_cate_name.setText("CATEGORY: " + cateSelect.getName());
-            }
-            index.set(index.get() + 1);
-        });
 
-        cateSelect = new Category(data.getCategory(), data.getPrefix());
         if (data.getState().equals("WAITING_FOR_ASSIGNING")) {
             button_accepted.setEnabled(true);
             button_cancel.setEnabled(true);
