@@ -58,7 +58,7 @@ public class CreateNewAssetActivity extends AppCompatActivity implements PopupMe
     List<Category> categories;
     TextView edCate;
     Dialog dialog;
-    public static CustomListViewCategoryAdapter customListViewCategoryAdapter;
+    public CustomListViewCategoryAdapter customListViewCategoryAdapter;
 
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
     MaterialDatePicker materialDatePicker;
@@ -326,6 +326,7 @@ public class CreateNewAssetActivity extends AppCompatActivity implements PopupMe
     public void openDialog() {
         Category_Dialog custom_dialog = new Category_Dialog(categories);
         custom_dialog.show(getSupportFragmentManager(), "Create category");
+        customListViewCategoryAdapter.notifyDataSetChanged();
 
     }
 }

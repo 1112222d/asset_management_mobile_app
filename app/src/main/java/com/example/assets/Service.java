@@ -99,7 +99,9 @@ public interface Service {
     @GET("request-assign")
     Call<List<AssignRequestRespone>> getAllAssignRequest();
     @PUT("request-assign/{id}")
-    Call<AssignRequestRespone> acceptedAssignRequest(@Path("id") Integer id,@Body AssignRequestRespone assignRequestRespone);
+    Call<AssignRequestRespone> editAssignRequest(@Path("id") Integer id,@Body AssignRequestEntity assignRequestEntity);
+//    @PUT("request-assign/{id}")
+//    Call<AssignRequestRespone> acceptedAssignRequest(@Path("id") Integer id,@Body AssignRequestRespone assignRequestRespone);
     @DELETE("request-assign/{id}")
     Call<Void> deleteAssignRequest(@Path("id") Integer id);
     @GET("department")

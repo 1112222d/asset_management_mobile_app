@@ -320,24 +320,24 @@ public class CreateNewAssignmentAccepctActivity extends AppCompatActivity {
     }
     private void accepted(AssignRequestRespone assignRequestRespone)
     {
-        MainActivity.service.acceptedAssignRequest(assignRequestRespone.getId(),assignRequestRespone).enqueue(new Callback<AssignRequestRespone>() {
-            @Override
-            public void onResponse(Call<AssignRequestRespone> call, Response<AssignRequestRespone> response) {
-                if(response.code()==204)
-                {
-                    Toast.makeText(CreateNewAssignmentAccepctActivity.this, "OK", Toast.LENGTH_SHORT).show();
-                }else
-                {
-                    MessageDialog.getInstance(CreateNewAssignmentAccepctActivity.this,"Error","Accepted Fail").show();
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AssignRequestRespone> call, Throwable t) {
-                MessageDialog.getInstance(CreateNewAssignmentAccepctActivity.this,"Error","Accepted Fail").show();
-
-            }
-        });
+//        MainActivity.service.acceptedAssignRequest(assignRequestRespone.getId(),assignRequestRespone).enqueue(new Callback<AssignRequestRespone>() {
+//            @Override
+//            public void onResponse(Call<AssignRequestRespone> call, Response<AssignRequestRespone> response) {
+//                if(response.code()==204)
+//                {
+//                    Toast.makeText(CreateNewAssignmentAccepctActivity.this, "OK", Toast.LENGTH_SHORT).show();
+//                }else
+//                {
+//                    MessageDialog.getInstance(CreateNewAssignmentAccepctActivity.this,"Error","Accepted Fail").show();
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<AssignRequestRespone> call, Throwable t) {
+//                MessageDialog.getInstance(CreateNewAssignmentAccepctActivity.this,"Error","Accepted Fail").show();
+//
+//            }
+//        });
     }
 }

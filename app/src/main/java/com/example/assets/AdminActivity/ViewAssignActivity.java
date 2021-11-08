@@ -84,31 +84,31 @@ public class ViewAssignActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         assignRequestRespone.setState("DECLINED");
                         assignRequestRespone.setNote(reason.getText().toString());
-                        MainActivity.service.acceptedAssignRequest(assignRequestRespone.getId(),assignRequestRespone).enqueue(new Callback<AssignRequestRespone>() {
-                            @Override
-                            public void onResponse(Call<AssignRequestRespone> call, Response<AssignRequestRespone> response) {
-                                if(response.code()==200)
-                                {
-                                    MessageDialog.getInstance(ViewAssignActivity.this,"Success","Decline success").setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog2.dismiss();
-                                        }
-                                    }).show();
-
-                                }else
-                                {
-                                    MessageDialog.getInstance(ViewAssignActivity.this,"Error","Decline Fail").show();
-
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<AssignRequestRespone> call, Throwable t) {
-                                MessageDialog.getInstance(ViewAssignActivity.this,"Error","Decline Fail").show();
-
-                            }
-                        });
+//                        MainActivity.service.acceptedAssignRequest(assignRequestRespone.getId(),assignRequestRespone).enqueue(new Callback<AssignRequestRespone>() {
+//                            @Override
+//                            public void onResponse(Call<AssignRequestRespone> call, Response<AssignRequestRespone> response) {
+//                                if(response.code()==200)
+//                                {
+//                                    MessageDialog.getInstance(ViewAssignActivity.this,"Success","Decline success").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                            dialog2.dismiss();
+//                                        }
+//                                    }).show();
+//
+//                                }else
+//                                {
+//                                    MessageDialog.getInstance(ViewAssignActivity.this,"Error","Decline Fail").show();
+//
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<AssignRequestRespone> call, Throwable t) {
+//                                MessageDialog.getInstance(ViewAssignActivity.this,"Error","Decline Fail").show();
+//
+//                            }
+//                        });
                     }
                 });
                 decline.setOnClickListener(new View.OnClickListener() {

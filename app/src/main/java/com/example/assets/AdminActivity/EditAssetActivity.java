@@ -27,9 +27,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.assets.Adapter.CustomListViewCategoryAdapter;
 import com.example.assets.Adapter.CustomListViewHistoryAdapter;
 import com.example.assets.Adapter.CustomSpinnerAdapter;
 import com.example.assets.AlterDialog.Category_Dialog;
+import com.example.assets.AlterDialog.Edit_Category_Dialog;
 import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
@@ -46,6 +48,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,9 +57,7 @@ import retrofit2.Response;
 public class EditAssetActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     EditText editName, editSepc;
-    TextView name, category, installDate, editInstallDate, state, idAssetEdit;
-    Spinner edCate;
-    public static CustomSpinnerAdapter customSpinnerAdapter;
+    TextView name, category, installDate, editInstallDate, state, idAssetEdit,edCate;
     List<Category> categories;
     Boolean status = false;
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
@@ -75,7 +76,7 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
         super.onStart();
         loadCate();
     }
-
+    public CustomListViewCategoryAdapter customListViewCategoryAdapter;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +92,9 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
         installDate = findViewById(R.id.tv_installDateEdit);
         editInstallDate = findViewById(R.id.ed_installedDateEdit);
         state = findViewById(R.id.ed_stateEdit);
-        edCate = findViewById(R.id.ed_cateEdit);
+        edCate = findViewById(R.id.ed_cate);
         categories = new ArrayList<>();
-        customSpinnerAdapter = new CustomSpinnerAdapter(categories,EditAssetActivity.this);
+        customListViewCategoryAdapter=new CustomListViewCategoryAdapter(EditAssetActivity.this,categories);
         cateSelect = new Category();
         button = findViewById(R.id.button_EditAsset);
         progress = findViewById(R.id.prgrsbarEditAsset);
@@ -106,6 +107,7 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
         editName.setEnabled(status);
         editSepc.setEnabled(status);
         button.setEnabled(status);
+        setData(asset);
         history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,7 +173,91 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
                 }
             }
         });
+        edCate.setOnClickListener(v->{
+            dialog = new Dialog(EditAssetActivity.this);
+            dialog.setContentView(R.layout.dialog_department_spinner);
+            dialog.getWindow().setLayout(800, 1800);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+            TextView title =dialog.findViewById(R.id.title);
+            ListView listView = dialog.findViewById(R.id.listView);
+            Button button = dialog.findViewById(R.id.create);
+            title.setText("Choose Category");
+            listView.setAdapter(customListViewCategoryAdapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    cateSelect = (Category) customListViewCategoryAdapter.getItem(position);
+                    Toast.makeText(EditAssetActivity.this, "" + cateSelect.getName()+" "+cateSelect.getPrefix(), Toast.LENGTH_SHORT).show();
+                    edCate.setText(cateSelect.getName());
+                    dialog.dismiss();
+                }
+            });
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    PopupMenu popup = new PopupMenu(view.getContext(), view);
+                    popup.inflate(R.menu.longclick);
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            Category category =(Category)customListViewCategoryAdapter.getItem(i);
+                            switch (item.getItemId()) {
+                                case R.id.edit: {
+                                    Edit_Category_Dialog custom_dialog = new Edit_Category_Dialog(categories,category);
+                                    custom_dialog.show(getSupportFragmentManager(), "Create category");
+                                    return true;
+                                }
+                                case R.id.delete: {
+                                    MessageDialog.getInstance(EditAssetActivity.this,"Are you sure?","Are you want to delete this category ("+category.getPrefix()+" "+category.getName()+") ?").setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            MainActivity.service.deleteCategory(category.getPrefix()).enqueue(new Callback<Void>() {
+                                                @RequiresApi(api = Build.VERSION_CODES.N)
+                                                @Override
+                                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                                    if(response.code()==409)
+                                                    {
+                                                        MessageDialog.getInstance(EditAssetActivity.this,"Error","Asset is available in category!").show();
 
+                                                    }
+                                                    if(response.code()==200)
+                                                    {
+                                                        List<Category> temp=categories.stream().filter(x->!x.getPrefix().equals(category.getPrefix())).collect(Collectors.toList());
+                                                        categories.clear();
+                                                        categories.addAll(temp);
+                                                        customListViewCategoryAdapter.notifyDataSetChanged();
+                                                        MessageDialog.getInstance(EditAssetActivity.this,"Success","Delete category success").show();
+                                                        CreateNewAssetActivity.cateSelect=new Category();
+                                                        EditAssetActivity.cateSelect=new Category();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<Void> call, Throwable t) {
+
+                                                }
+                                            });
+                                        }
+                                    }).setNegativeButton("NO",null).show();
+                                    return true;
+                                }
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    popup.show();
+                    return true;
+                }
+            });
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openDialog();
+                }
+            });
+        });
         button.setOnClickListener(v -> {
             progress.setVisibility(View.VISIBLE);
             Boolean check = true;
@@ -217,13 +303,7 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
                 progress.setVisibility(View.INVISIBLE);
             }
         });
-        edCate.setAdapter(customSpinnerAdapter);
-        edCate.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+
         editName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -271,8 +351,9 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
             builder.setTitleText("Select your joined date");
             builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
             if (installedDate != 0) {
-                calendar.setTime(new Date(installedDate));
-                builder.setSelection(calendar.getTimeInMillis());
+//                calendar.setTime(new Date(installedDate));
+                calendar.setTimeInMillis(installedDate);
+                builder.setSelection(installedDate);
             }
             materialDatePicker = builder.build();
             calendar.clear();
@@ -288,19 +369,17 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
 
     }
 
-    private void loadCate() {
+    private void loadCate(){
         MainActivity.service.getCategory().enqueue(new Callback<List<Category>>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
-                if (response.code() == 200) {
+                if(response.code()==200)
+                {
                     categories.clear();
                     categories.addAll(response.body());
-                    categories.add(new Category("Create new category", ""));
-                    customSpinnerAdapter.notifyDataSetChanged();
-                    edCate.setSelection(0);
-                    cateSelect = categories.get(0);
-                    setData(asset);
+                    customListViewCategoryAdapter.notifyDataSetChanged();
+                    edCate.setText(categories.get(0).getName());
+                    cateSelect= categories.get(0);
                 }
             }
 
@@ -338,7 +417,7 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
     public void openDialog() {
         Category_Dialog custom_dialog = new Category_Dialog(categories);
         custom_dialog.show(getSupportFragmentManager(), "Create category");
-
+        customListViewCategoryAdapter.notifyDataSetChanged();
     }
 
     private void setStatus(Boolean status) {
@@ -385,7 +464,6 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
         index.set(0);
         categories.stream().forEach(x -> {
             if (x.getPrefix().equals(data.getCategoryPrefix())) {
-                edCate.setSelection(index.get());
                 cateSelect = categories.get(index.get());
                 category.setText("CATEGORY: " + cateSelect.getName());
             }

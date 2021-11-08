@@ -248,6 +248,7 @@ public class EditAssignActivity extends AppCompatActivity {
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
                     EditText note = dialog.findViewById(R.id.note);
+                    note.setText(respone.getNote());
                     Button cancel,create;
                     cancel=dialog.findViewById(R.id.cancel);
                     create=dialog.findViewById(R.id.create);
@@ -274,12 +275,13 @@ public class EditAssignActivity extends AppCompatActivity {
                             assignRequestEntity.setIntendedReturnDate(DateFormat.format("dd/MM/yyyy", new Date(dueDate)).toString());
                             assignRequestEntity.setIntendedAssignDate(DateFormat.format("dd/MM/yyyy", new Date(startDate)).toString());
                             assignRequestEntity.setNote(note.getText().toString());
-                            MainActivity.service.createAssignRequest(assignRequestEntity).enqueue(new Callback<AssignRequestRespone>() {
+                            MainActivity.service.editAssignRequest(respone.getId(),assignRequestEntity).enqueue(new Callback<AssignRequestRespone>() {
                                 @Override
                                 public void onResponse(Call<AssignRequestRespone> call, Response<AssignRequestRespone> response) {
                                     if(response.code()==200)
                                     {
-                                        MessageDialog.getInstance(EditAssignActivity.this, "Success", "Create assign request success").show();
+                                        MessageDialog.getInstance(EditAssignActivity.this, "Success", "Edit assign request success").show();
+                                        dialog.dismiss();
                                     }else
                                     {
                                         Gson gson = new Gson();

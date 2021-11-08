@@ -28,8 +28,11 @@ import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
 import com.example.assets.Model.User;
+import com.example.assets.MyErrorMessage;
 import com.example.assets.R;
+import com.example.assets.UserActivity.EditAssignActivity;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.gson.Gson;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -152,7 +155,11 @@ public class UserManagementActivity extends AppCompatActivity {
                         indicator.setProgressCompat(100, true);
                         loadUser();
                     } else {
-                        Toast.makeText(UserManagementActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                        Gson gson = new Gson();
+                        MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                        MessageDialog.getInstance(UserManagementActivity.this, message.getError(),
+                                message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
+                        }).show();
                     }
                 }
 
