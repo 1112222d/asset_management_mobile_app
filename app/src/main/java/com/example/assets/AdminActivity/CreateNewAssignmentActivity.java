@@ -55,16 +55,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CreateNewAssignmentActivity extends AppCompatActivity {
-    RelativeLayout userSearch, assetSearch, prgrsbarAssign;
+    RelativeLayout userSearch, prgrsbarAssign;
     List<Asset> assets;
     List<Asset> listSearchAsset;
     List<User> users;
     List<User> listSearchUser;
     User userSelect;
-    Asset assetSelect;
     EditText ed_note;
-    ImageView backBackAsset;
-    TextView tv_userSelect, tv_assetSelect, tv_assignedDate, ed_assignedDate, tv_nameAssign, tv_asset;
+    ImageView backBackAsset, assetSearch;
+    TextView tv_userSelect, tv_assignedDate, ed_assignedDate, tv_nameAssign, ed_returnDate;
     Button button_createAssign;
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
     MaterialDatePicker materialDatePicker;
@@ -72,30 +71,32 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
     CustomListViewSearchAssetAdapter customListViewSearchAssetAdapter;
     Dialog dialog;
     final Calendar calendar = Calendar.getInstance();
-    long assignedDate;
+    long assignedDate,returnDate;
+    Assignment assignment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_assignment);
         userSearch = findViewById(R.id.userSearch);
-        assetSearch = findViewById(R.id.assetSearch);
+        assetSearch = findViewById(R.id.add_asset);
         assets = new ArrayList<>();
         users = new ArrayList<>();
         listSearchUser = new ArrayList<>();
         listSearchAsset = new ArrayList<>();
-        tv_assetSelect = findViewById(R.id.TV_AssetSelect);
         tv_userSelect = findViewById(R.id.TV_UserSelect);
         tv_assignedDate = findViewById(R.id.tv_assignedDate);
         ed_assignedDate = findViewById(R.id.ed_assignedDate);
+        ed_returnDate = findViewById(R.id.ed_returnDate);
         ed_note = findViewById(R.id.ed_note);
         tv_nameAssign = findViewById(R.id.tv_nameAssign);
-        tv_asset = findViewById(R.id.tv_asset);
         button_createAssign = findViewById(R.id.button_createAssign);
         prgrsbarAssign = findViewById(R.id.prgrsbarAssign);
         tv_assignedDate.setText("Assigned Date: " + DateFormat.format("dd/MM/yyyy", new Date()).toString());
         ed_assignedDate.setText(DateFormat.format("dd/MM/yyyy", new Date()).toString());
         assignedDate = new Date().getTime();
+        returnDate = new Date().getTime();
+        assignment = new Assignment();
         backBackAsset = findViewById(R.id.backBackAsset);
         backBackAsset.setOnClickListener(v -> finish());
         load();
@@ -172,10 +173,11 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        assetSelect = (Asset) customListViewSearchAssetAdapter.getItem(position);
-                        tv_assetSelect.setText(assetSelect.getAssetName());
-                        tv_asset.setText("Asset:" + assetSelect.getAssetName());
-                        Toast.makeText(CreateNewAssignmentActivity.this, "" + assetSelect.getAssetCode(), Toast.LENGTH_SHORT).show();
+                        Asset asset = (Asset) customListViewSearchAssetAdapter.getItem(position);
+                        assignment.getAssignmentDetails().add(new Assignment.AssignmentDetail(asset.getAssetCode(), asset.getAssetName(), asset.getCategoryName(), asset.getSpecification(), asset.getState(), null));
+
+                        Toast.makeText(CreateNewAssignmentActivity.this, "" + asset.getAssetCode(), Toast.LENGTH_SHORT).show();
+                        load();
                         dialog.dismiss();
                     }
                 });
@@ -191,7 +193,7 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
                             "Please choose user!").show();
                     check = false;
                 }
-                if (assetSelect == null) {
+                if (assignment.getAssignmentDetails().size() == 0) {
                     MessageDialog.getInstance(CreateNewAssignmentActivity.this, "Error",
                             "Please choose asset!").show();
                     check = false;
@@ -215,11 +217,11 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
 //                }
                 if (check) {
                     Assignment assignment = new Assignment();
-                    assignment.setAssetCode(assetSelect.getAssetCode());
-                    assignment.setAssetName(assetSelect.getAssetName());
+//                    assignment.setAssetCode(assetSelect.getAssetCode());
+//                    assignment.setAssetName(assetSelect.getAssetName());
                     assignment.setAssignedTo(userSelect.getUsername());
                     assignment.setNote(ed_note.getText().toString());
-                    assignment.setSpecfication(assetSelect.getSpecification());
+//                    assignment.setSpecfication(assetSelect.getSpecification());
                     assignment.setAssignedDate(ed_assignedDate.getText().toString());
                     MainActivity.service.createAssignment(assignment).enqueue(new Callback<Assignment>() {
                         @Override
@@ -261,15 +263,14 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
 
     private void reload() {
         userSelect = null;
-        assetSelect = null;
         tv_assignedDate.setText("Assigned Date: " + DateFormat.format("dd/MM/yyyy", new Date()).toString());
         ed_assignedDate.setText(DateFormat.format("dd/MM/yyyy", new Date()).toString());
         ed_note.setText("");
         tv_userSelect.setText("User");
-        tv_assetSelect.setText("Asset");
-        tv_asset.setText("Asset:");
+
         tv_nameAssign.setText("New Assignment");
         assignedDate = new Date().getTime();
+        returnDate = new Date().getTime();
         calendar.clear();
     }
 
@@ -283,7 +284,7 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
                     listSearchUser.clear();
 //                    users.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
 //                    listSearchUser.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
-                    users.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable")&&!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))).collect(Collectors.toList()));
+                    users.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable") && !x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))).collect(Collectors.toList()));
                     listSearchUser.addAll(users);
                 }
             }
@@ -298,10 +299,16 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Asset>> call, Response<List<Asset>> response) {
                 if (response.code() == 200) {
+                    assets.clear();
+                    listSearchAsset.clear();
                     assets.addAll(response.body());
-                    listSearchAsset.addAll(response.body().stream().filter(x -> {
-                        return x.getState().equals("AVAILABLE");
-                    }).collect(Collectors.toList()));
+                    response.body().stream().forEach(x -> {
+                        if (x.getState().equals("AVAILABLE")) {
+                            if (!assignment.getAssignmentDetails().stream().anyMatch(y -> x.getAssetCode().equals(y.getAssetCode()))) {
+                                listSearchAsset.add(x);
+                            }
+                        }
+                    });
                 }
             }
 
@@ -327,6 +334,23 @@ public class CreateNewAssignmentActivity extends AppCompatActivity {
             String dateString = DateFormat.format("dd/MM/yyyy", new Date(assignedDate)).toString();
             ed_assignedDate.setText(dateString);
             tv_assignedDate.setText("Assigned Date: " + dateString);
+
+        });
+
+    }public void selectReturnedDate(View v) {
+        builder.setTitleText("Select returned date");
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
+        if (returnDate != 0) {
+            calendar.setTime(new Date(returnDate));
+            builder.setSelection(calendar.getTimeInMillis());
+        }
+        materialDatePicker = builder.build();
+        calendar.clear();
+        materialDatePicker.show(getSupportFragmentManager(), "Date_picker");
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            returnDate = (long) selection;
+            String dateString = DateFormat.format("dd/MM/yyyy", new Date(returnDate)).toString();
+            ed_returnDate.setText(dateString);
 
         });
 

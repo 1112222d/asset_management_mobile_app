@@ -164,11 +164,13 @@ public class CreateNewAssignmentAccepctActivity extends AppCompatActivity {
 //                }
                 if (check) {
                     Assignment assignment = new Assignment();
-                    assignment.setAssetCode(assetSelect.getAssetCode());
-                    assignment.setAssetName(assetSelect.getAssetName());
+                    //set list assignment
+//                    assignment.setAssetCode(assetSelect.getAssetCode());
+//                    assignment.setAssetName(assetSelect.getAssetName());
+//                    assignment.setSpecfication(assetSelect.getSpecification());
                     assignment.setAssignedTo(users.getUsername());
                     assignment.setNote(ed_note.getText().toString());
-                    assignment.setSpecfication(assetSelect.getSpecification());
+
                     assignment.setAssignedDate(ed_assignedDate.getText().toString());
                     MainActivity.service.createAssignment(assignment).enqueue(new Callback<Assignment>() {
                         @Override

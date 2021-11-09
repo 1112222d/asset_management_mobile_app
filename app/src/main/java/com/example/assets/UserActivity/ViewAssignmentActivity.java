@@ -245,8 +245,6 @@ public class ViewAssignmentActivity extends AppCompatActivity {
 
     private void setData(Assignment data)
     {
-        tv_assetSelect.setText(data.getAssetName());
-        tv_asset.setText("Asset Code:"+data.getAssetCode());
         tv_userSelect.setText(data.getAssignedTo());
         tv_nameAssign.setText(data.getAssignedTo());
         ed_assignedDate.setText(data.getAssignedDate());

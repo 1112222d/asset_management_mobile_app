@@ -72,14 +72,14 @@ public class CustomListViewHistoryAdapter extends BaseAdapter {
         holder.date.setText(assignment.getAssignedDate());
         holder.assignedTo.setText(assignment.getAssignedTo());
         holder.assignedBy.setText(assignment.getAssignedBy());
-        if(assignment.getReturnedDate()!=null)
-        {
-            holder.returnDate.setText(assignment.getReturnedDate().toString());
-        }
-        else
-        {
-            holder.returnDate.setText("");
-        }
+//        if(assignment.getReturnedDate()!=null)
+//        {
+//            holder.returnDate.setText(assignment.getReturnedDate().toString());
+//        }
+//        else
+//        {
+//            holder.returnDate.setText("");
+//        }
 
         convertView.setTag(holder);
         return convertView;

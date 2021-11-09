@@ -150,7 +150,8 @@ public class MyAssignmentActivity extends AppCompatActivity {
         if(!key.equals(""))
         {
             listShowAssignment.addAll(listDataAssignment.stream().filter(x->{
-                return x.getAssetName().toLowerCase().contains(key.toLowerCase())||x.getAssetCode().toLowerCase().contains(key.toLowerCase())||x.getId().toString().toLowerCase().contains(key.toLowerCase())||x.getAssignedTo().toLowerCase().contains(key.toLowerCase());
+//                return x.getAssetName().toLowerCase().contains(key.toLowerCase())||x.getAssetCode().toLowerCase().contains(key.toLowerCase())||x.getId().toString().toLowerCase().contains(key.toLowerCase())||x.getAssignedTo().toLowerCase().contains(key.toLowerCase());
+                return x.getId().toString().toLowerCase().contains(key.toLowerCase())||x.getAssignedTo().toLowerCase().contains(key.toLowerCase());
             }).collect(Collectors.toList()));
             listFilterAssignment.addAll(filter(listShowAssignment,item_select));
             sort();

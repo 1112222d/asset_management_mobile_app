@@ -207,17 +207,18 @@ public class EditAssignmentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 prgrsbarAssign.setVisibility(View.VISIBLE);
                 Assignment assignment=new Assignment();
-                if(assetSelect.getAssetName()==null||assetSelect.getAssetName()==null)
-                {
-                    assignment.setAssetCode(assignmentSelect.getAssetCode());
-                    assignment.setAssetName(assignmentSelect.getAssetName());
-                    assignment.setSpecfication(assignmentSelect.getSpecfication());
-                }else
-                {
-                    assignment.setAssetCode(assetSelect.getAssetCode());
-                    assignment.setAssetName(assetSelect.getAssetName());
-                    assignment.setSpecfication(assetSelect.getSpecification());
-                }
+                //set list assignment
+//                if(assetSelect.getAssetName()==null||assetSelect.getAssetName()==null)
+//                {
+//                    assignment.setAssetCode(assignmentSelect.getAssetCode());
+//                    assignment.setAssetName(assignmentSelect.getAssetName());
+//                    assignment.setSpecfication(assignmentSelect.getSpecfication());
+//                }else
+//                {
+//                    assignment.setAssetCode(assetSelect.getAssetCode());
+//                    assignment.setAssetName(assetSelect.getAssetName());
+//                    assignment.setSpecfication(assetSelect.getSpecification());
+//                }
                 if(userSelect.getUsername()==null)
                 {
                     assignment.setAssignedTo(assignmentSelect.getAssignedTo());
@@ -330,8 +331,6 @@ public class EditAssignmentActivity extends AppCompatActivity {
     }
     private void setData(Assignment data)
     {
-        tv_assetSelect.setText(data.getAssetName());
-        tv_asset.setText("Asset Code:"+data.getAssetCode());
         tv_userSelect.setText(data.getAssignedTo());
         tv_nameAssign.setText(data.getAssignedTo());
         ed_assignedDate.setText(data.getAssignedDate());

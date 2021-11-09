@@ -65,7 +65,7 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
 
 
     private class ViewHolder {
-        TextView assetName, assignTo, assignBy,idAssignment;
+        TextView  assignTo, assignBy,idAssignment;
         TextView state, date;
         LinearLayout check, cancel, refresh;
         ImageView im_check, im_cancel, im_refresh;
@@ -82,7 +82,7 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
         holder.idAssignment=convertView.findViewById(R.id.idAssignment);
         holder.assignTo =  convertView.findViewById(R.id.nameAssignTo);
         holder.assignBy = convertView.findViewById(R.id.nameAssignBy);
-        holder.assetName = convertView.findViewById(R.id.nameAsset);
+//        holder.assetName = convertView.findViewById(R.id.nameAsset);
         holder.state = convertView.findViewById(R.id.stateAssign);
         holder.date = convertView.findViewById(R.id.dateAssign);
         holder.check = convertView.findViewById(R.id.check);
@@ -92,7 +92,7 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
         holder.im_cancel = convertView.findViewById(R.id.ic_cancel);
         holder.im_refresh = convertView.findViewById(R.id.ic_refresh);
 
-        holder.assetName.setText(assignment.getAssetName());
+//        holder.assetName.setText(assignment.getAssetName());
         holder.assignTo.setText(assignment.getAssignedTo());
         holder.state.setText(state(assignment.getState()));
         holder.assignBy.setText(assignment.getAssignedBy());
@@ -105,7 +105,8 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
             holder.im_cancel.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_cancel));
             holder.im_refresh.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_refresh_not_available));
 
-        }else if(assignment.getState().equals("ACCEPTED")&&!assignment.getCreatedRequest())
+//        }else if(assignment.getState().equals("ACCEPTED")&&!assignment.getCreatedRequest())
+        }else if(assignment.getState().equals("ACCEPTED"))
         {
             holder.im_check.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_check_not_availalbe));
             holder.im_cancel.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_cancel_not_available));
@@ -226,7 +227,8 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
         holder.refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (assignment.getState().equals("ACCEPTED")&&!assignment.getCreatedRequest()) {
+//                if (assignment.getState().equals("ACCEPTED")&&!assignment.getCreatedRequest()) {
+                if (assignment.getState().equals("ACCEPTED")) {
                     MessageDialog.getInstance(parent.getContext(), "Are you sure?",
                             "Do you want to create returning request this asset?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
@@ -290,7 +292,7 @@ public class CustomListViewAssignmentUserAdapter extends BaseAdapter {
                 if(response.code()==200)
                 {
                     MessageDialog.getInstance(context,"Success","Create returning asset success").show();
-                    assignment.setCreatedRequest(true);
+//                    assignment.setCreatedRequest(true);
                     assignment.setState("WAITING_FOR_RETURNING");
                     notifyDataSetChanged();
                 }else

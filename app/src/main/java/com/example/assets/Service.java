@@ -71,7 +71,7 @@ public interface Service {
     @GET("assignment/home")
     Call<List<Assignment>> getAllAssignmentUser();
     @PUT("assignment/staff/{assignmentId}")
-    Call<Assignment> changeStateStaffAssignment(@Path("assignmentId") Long assignmentId,@Body Assignment assignment);
+    Call<Assignment> changeStateStaffAssignment(@Path("assignmentId") Integer assignmentId,@Body Assignment assignment);
     @POST("auth/otp")
     Call<Map<String,String>> getOtp(@Body Map<String,String> email);
     @POST("auth/forgotPassword")
