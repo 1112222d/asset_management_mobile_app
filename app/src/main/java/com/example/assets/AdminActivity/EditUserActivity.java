@@ -122,13 +122,11 @@ public class EditUserActivity extends AppCompatActivity implements PopupMenu.OnM
                             deleteUser(user);
                         }else
                         {
-                            if(response.code()==409)
-                            {
-                                MessageDialog.getInstance(EditUserActivity.this, "Error",
-                                        "There are valid assignments belonging to user.\n Please close all assignments before disabling user").setPositiveButton("OK", (dialog, which) -> {
-                                }).show();
-                            }else
-                                MessageDialog.getInstance(EditUserActivity.this,"Error","Something went wrong").show();
+                            Gson gson = new Gson();
+                            MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                            MessageDialog.getInstance(EditUserActivity.this, message.getError(),
+                                    message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
+                            }).show();
                         }
                     }
                 }

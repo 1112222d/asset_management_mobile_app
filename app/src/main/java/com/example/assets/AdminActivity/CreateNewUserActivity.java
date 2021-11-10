@@ -32,9 +32,11 @@ import com.example.assets.Model.Department;
 import com.example.assets.Model.Gender;
 import com.example.assets.Model.User;
 import com.example.assets.Model.UserRequest;
+import com.example.assets.MyErrorMessage;
 import com.example.assets.R;
 import com.example.assets.Utils.VNCharacterUtils;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -329,8 +331,10 @@ public class CreateNewUserActivity extends AppCompatActivity implements PopupMen
                                 finish();
                             }).show();
                         } else {
-                            MessageDialog.getInstance(CreateNewUserActivity.this, "Error",
-                                    "Email is exists").setPositiveButton("OK", (dialog, which) -> {
+                            Gson gson = new Gson();
+                            MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                            MessageDialog.getInstance(CreateNewUserActivity.this, message.getError(),
+                                    message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
                             }).show();
                         }
 

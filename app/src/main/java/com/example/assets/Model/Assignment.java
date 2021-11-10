@@ -130,7 +130,7 @@ public class Assignment implements Serializable {
     public void setAssignmentDetails(List<AssignmentDetail> assignmentDetails) {
         this.assignmentDetails = assignmentDetails;
     }
-    public static class AssignmentDetail {
+    public static class AssignmentDetail implements Serializable{
 
         @SerializedName("assetCode")
         @Expose

@@ -24,20 +24,25 @@ import android.widget.Toast;
 
 import com.example.assets.Adapter.CustomListViewSearchAssetAdapter;
 import com.example.assets.Adapter.CustomListViewSearchUserAdapter;
+import com.example.assets.Adapter.CustomListViewShowAssetSelectedAdapter;
 import com.example.assets.Adapter.SearchModel;
 import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
 import com.example.assets.Model.Assignment;
 import com.example.assets.Model.User;
+import com.example.assets.MyErrorMessage;
 import com.example.assets.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import ir.mirrajabi.searchdialog.SimpleSearchDialogCompat;
@@ -49,62 +54,61 @@ import retrofit2.Response;
 
 public class EditAssignmentActivity extends AppCompatActivity {
 
-    RelativeLayout userSearch, assetSearch,prgrsbarAssign;
+    RelativeLayout userSearch,prgrsbarAssign;
     List<Asset> assets;
     List<Asset> listSearchAsset;
-    List<User> users;
-    List<User> listSearchUser;
+    List<User> users,listSearchUser;
     User userSelect;
     Asset assetSelect;
-    EditText ed_note;
     CustomListViewSearchUserAdapter customListViewSearchUserAdapter;
     CustomListViewSearchAssetAdapter customListViewSearchAssetAdapter;
+    CustomListViewShowAssetSelectedAdapter customListViewShowAssetSelectedAdapter;
     Dialog dialog;
-
-    TextView tv_userSelect,tv_assetSelect,tv_assignedDate,ed_assignedDate,tv_nameAssign,tv_asset,idAssignmentEdit,state;
+    ListView lv_assetSelect;
+    TextView tv_userSelect,ed_assignedDate,tv_nameAssign,tv_asset,ed_returnDate,tv_assignedDate;
     Button button_createAssign;
     MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
     MaterialDatePicker materialDatePicker;
     final Calendar calendar = Calendar.getInstance();
-    long assignedDate;
-    Assignment assignmentSelect;
-    ImageView edit,backBackAsset;
+    long assignedDate,returnDate;
+    Assignment assignment;
+    ImageView edit,backBackAsset,assetSearch;
     Boolean status=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_assignment);
-        idAssignmentEdit=findViewById(R.id.idAssignmentEdit);
+
         userSearch = findViewById(R.id.userSearch);
-        assetSearch = findViewById(R.id.assetSearch);
-        state=findViewById(R.id.stateAssign);
+        assetSearch = findViewById(R.id.add_asset);
         assets = new ArrayList<>();
         users = new ArrayList<>();
         assetSelect=new Asset();
         userSelect=new User();
         listSearchUser = new ArrayList<>();
         listSearchAsset = new ArrayList<>();
-        tv_assetSelect=findViewById(R.id.TV_AssetSelect);
         tv_userSelect=findViewById(R.id.TV_UserSelect);
-        tv_assignedDate=findViewById(R.id.tv_assignedDate);
+        ed_returnDate = findViewById(R.id.ed_returnDate);
         ed_assignedDate=findViewById(R.id.ed_assignedDate);
-        ed_note=findViewById(R.id.ed_note);
+        tv_assignedDate = findViewById(R.id.tv_assignedDate);
+        lv_assetSelect = findViewById(R.id.lv_assetSelect);
         tv_nameAssign=findViewById(R.id.tv_nameAssign);
         tv_asset=findViewById(R.id.tv_asset);
         button_createAssign=findViewById(R.id.button_createAssign);
         prgrsbarAssign=findViewById(R.id.prgrsbarAssign);
         Intent intent = getIntent();
         edit=findViewById(R.id.edit);
-        assignmentSelect = (Assignment) intent.getSerializableExtra("assignment");
+        assignment = (Assignment) intent.getSerializableExtra("assignment");
         backBackAsset=findViewById(R.id.backBackAsset);
         backBackAsset.setOnClickListener(v -> finish());
-        setData(assignmentSelect);
+        setData(assignment);
         setStatus(status);
         load();
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(assignmentSelect.getState().equals("WAITING_FOR_ACCEPTANCE"))
+                if(assignment.getState().equals("WAITING_FOR_ACCEPTANCE"))
                 {
                     status=!status;
                     setStatus(status);
@@ -119,162 +123,198 @@ public class EditAssignmentActivity extends AppCompatActivity {
         userSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(status) {
-                    dialog = new Dialog(EditAssignmentActivity.this);
-                    dialog.setContentView(R.layout.dialog_searchable_spinner);
-                    dialog.getWindow().setLayout(800, 1800);
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialog.show();
-                    EditText editText = dialog.findViewById(R.id.edit_text);
-                    ListView listView = dialog.findViewById(R.id.listView);
-                    customListViewSearchUserAdapter = new CustomListViewSearchUserAdapter(EditAssignmentActivity.this, listSearchUser);
-                    listView.setAdapter(customListViewSearchUserAdapter);
-                    editText.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                dialog = new Dialog(EditAssignmentActivity.this);
+                dialog.setContentView(R.layout.dialog_searchable_spinner);
+                dialog.getWindow().setLayout(800, 1800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+                EditText editText = dialog.findViewById(R.id.edit_text);
+                ListView listView = dialog.findViewById(R.id.listView);
+                customListViewSearchUserAdapter = new CustomListViewSearchUserAdapter(EditAssignmentActivity.this, listSearchUser);
+                listView.setAdapter(customListViewSearchUserAdapter);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                        }
+                    }
 
-                        @RequiresApi(api = Build.VERSION_CODES.N)
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            searchUser(s.toString());
-                        }
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        searchUser(s.toString());
+                    }
 
-                        @Override
-                        public void afterTextChanged(Editable s) {
+                    @Override
+                    public void afterTextChanged(Editable s) {
 
-                        }
-                    });
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            userSelect = (User) customListViewSearchUserAdapter.getItem(position);
-                            Toast.makeText(EditAssignmentActivity.this, "" + userSelect.getStaffCode(), Toast.LENGTH_SHORT).show();
-                            tv_userSelect.setText(userSelect.getFullName());
-                            tv_nameAssign.setText(userSelect.getFullName());
-                            dialog.dismiss();
-                        }
-                    });
-                }
+                    }
+                });
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        userSelect = (User) customListViewSearchUserAdapter.getItem(position);
+                        Toast.makeText(EditAssignmentActivity.this, "" + userSelect.getStaffCode(), Toast.LENGTH_SHORT).show();
+                        tv_userSelect.setText(userSelect.getFullName());
+                        tv_nameAssign.setText(userSelect.getFullName());
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         assetSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(status) {
-                    dialog = new Dialog(EditAssignmentActivity.this);
-                    dialog.setContentView(R.layout.dialog_searchable_asset_spinner);
-                    dialog.getWindow().setLayout(800, 1800);
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialog.show();
-                    EditText editText = dialog.findViewById(R.id.edit_text);
-                    ListView listView = dialog.findViewById(R.id.listView);
-                    customListViewSearchAssetAdapter = new CustomListViewSearchAssetAdapter(EditAssignmentActivity.this, listSearchAsset);
-                    listView.setAdapter(customListViewSearchAssetAdapter);
-                    editText.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                dialog = new Dialog(EditAssignmentActivity.this);
+                dialog.setContentView(R.layout.dialog_searchable_asset_spinner);
+                dialog.getWindow().setLayout(800, 1800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+                EditText editText = dialog.findViewById(R.id.edit_text);
+                ListView listView = dialog.findViewById(R.id.listView);
+                customListViewSearchAssetAdapter = new CustomListViewSearchAssetAdapter(EditAssignmentActivity.this, listSearchAsset);
+                listView.setAdapter(customListViewSearchAssetAdapter);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                        }
+                    }
 
-                        @RequiresApi(api = Build.VERSION_CODES.N)
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            searchAsset(s.toString());
-                        }
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        searchAsset(s.toString());
+                    }
 
-                        @Override
-                        public void afterTextChanged(Editable s) {
+                    @Override
+                    public void afterTextChanged(Editable s) {
 
-                        }
-                    });
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            assetSelect = (Asset) customListViewSearchAssetAdapter.getItem(position);
-                            tv_assetSelect.setText(assetSelect.getAssetName());
-                            tv_asset.setText("Asset Code:" + assetSelect.getAssetCode());
-                            Toast.makeText(EditAssignmentActivity.this, "" + assetSelect.getAssetCode(), Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        }
-                    });
-                }
+                    }
+                });
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Asset asset = (Asset) customListViewSearchAssetAdapter.getItem(position);
+                        assignment.getAssignmentDetails().add(new Assignment.AssignmentDetail(asset.getAssetCode(), asset.getAssetName(), asset.getCategoryName(), asset.getSpecification(), asset.getState(), null));
+                        customListViewShowAssetSelectedAdapter.notifyDataSetChanged();
+                        Toast.makeText(EditAssignmentActivity.this, "" + asset.getAssetCode(), Toast.LENGTH_SHORT).show();
+                        load();
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         button_createAssign.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 prgrsbarAssign.setVisibility(View.VISIBLE);
-                Assignment assignment=new Assignment();
-                //set list assignment
-//                if(assetSelect.getAssetName()==null||assetSelect.getAssetName()==null)
-//                {
-//                    assignment.setAssetCode(assignmentSelect.getAssetCode());
-//                    assignment.setAssetName(assignmentSelect.getAssetName());
-//                    assignment.setSpecfication(assignmentSelect.getSpecfication());
-//                }else
-//                {
-//                    assignment.setAssetCode(assetSelect.getAssetCode());
-//                    assignment.setAssetName(assetSelect.getAssetName());
-//                    assignment.setSpecfication(assetSelect.getSpecification());
-//                }
-                if(userSelect.getUsername()==null)
-                {
-                    assignment.setAssignedTo(assignmentSelect.getAssignedTo());
-                }else
-                {
-                    assignment.setAssignedTo(userSelect.getUsername());
+                Boolean check = true;
+                if (userSelect == null) {
+                    MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                            "Please choose user!").show();
+                    check = false;
                 }
-                assignment.setNote(ed_note.getText().toString());
+                if (assignment.getAssignmentDetails().size() == 0) {
+                    MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                            "Please choose asset!").show();
+                    check = false;
+                }
+                if (ed_assignedDate.getText().toString().equals("dd/MM/yyyy")) {
+                    MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                            "Please choose date!").show();
+                    check = false;
+                } else {
+                    String message = checkDate(ed_assignedDate.getText().toString());
+                    if (!message.equals("")) {
+                        MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                                message).show();
+                        check = false;
+                    }
+                }
+                if (ed_returnDate.getText().toString().equals("dd/MM/yyyy")) {
+                    MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                            "Please choose date!").show();
+                    check = false;
+                } else {
+                    String message = checkDate(ed_returnDate.getText().toString());
+                    if (!message.equals("")) {
+                        MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                                message).show();
+                        check = false;
+                    }
+                }
+                if (check) {
+                    assignment.setAssignedTo(userSelect.getUsername());
+                    assignment.setNote("");
+                    assignment.setAssignedDate(ed_assignedDate.getText().toString());
+                    assignment.setIntendedReturnDate(ed_returnDate.getText().toString());
+                    assignment.getAssignmentDetails().stream().forEach(x->x.setState(null));
+                    MainActivity.service.createAssignment(assignment).enqueue(new Callback<Assignment>() {
+                        @Override
+                        public void onResponse(Call<Assignment> call, Response<Assignment> response) {
+                            prgrsbarAssign.setVisibility(View.INVISIBLE);
+                            if (response.code() == 200) {
+                                MessageDialog.getInstance(EditAssignmentActivity.this, "Success",
+                                        "Create assignment success").show();
+                                AssignmentManagementActivity.assignmentNew = response.body();
+                                load();
+                                reload();
 
-                assignment.setAssignedDate(ed_assignedDate.getText().toString());
-                MainActivity.service.updateAssignment(assignment,assignmentSelect.getId().toString()).enqueue(new Callback<Assignment>() {
-                    @Override
-                    public void onResponse(Call<Assignment> call, Response<Assignment> response) {
-                        prgrsbarAssign.setVisibility(View.INVISIBLE);
-                        if(response.code()==200)
-                        {
-                            MessageDialog.getInstance(EditAssignmentActivity.this, "Success",
-                                    "Edit assignment success").show();
-                        }else
-                        {
-                            if(response.code()==409)
-                            {
-                                MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
-                                        "Asset must available state!").show();
-                            }else
-                            {
-                                MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
-                                        "Something went wrong").show();
+                            } else {
+                                Gson gson = new Gson();
+                                MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                                MessageDialog.getInstance(EditAssignmentActivity.this, message.getError(),
+                                        message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
+                                }).show();
                             }
+
                         }
 
-                    }
-
-                    @Override
-                    public void onFailure(Call<Assignment> call, Throwable t) {
-                        prgrsbarAssign.setVisibility(View.INVISIBLE);
-                        MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
-                                "Something went wrong").show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<Assignment> call, Throwable t) {
+                            prgrsbarAssign.setVisibility(View.INVISIBLE);
+                            MessageDialog.getInstance(EditAssignmentActivity.this, "Error",
+                                    "Something went wrong").show();
+                        }
+                    });
+                } else {
+                    prgrsbarAssign.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
     }
 
 
+    private void reload() {
+        userSelect = null;
+        tv_assignedDate.setText("Assigned Date: " + DateFormat.format("dd/MM/yyyy", new Date()).toString());
+        ed_assignedDate.setText(DateFormat.format("dd/MM/yyyy", new Date()).toString());
+        tv_userSelect.setText("User");
 
+        tv_nameAssign.setText("New Assignment");
+        assignedDate = new Date().getTime();
+        returnDate = new Date().getTime();
+        calendar.clear();
+    }
     private void load() {
         MainActivity.service.getAllUser().enqueue(new Callback<List<User>>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if (response.code() == 200) {
-                    users.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
-                    listSearchUser.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
-
+                    users.clear();
+                    listSearchUser.clear();
+//                    users.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
+//                    listSearchUser.addAll(response.body().stream().filter(x->(!x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))&&x.getState().equals("Enable")).collect(Collectors.toList()));
+                    users.addAll(response.body().stream().filter(x -> (x.getState().equals("Enable") && !x.getStaffCode().equals(MainActivity.loginResponse.getStaffCode()))).collect(Collectors.toList()));
+                    User u=response.body().stream().filter(x->x.getUsername().equals(assignment.getAssignedTo())).findFirst().orElse(null);
+                    if(u!=null)
+                    {
+                        tv_userSelect.setText(u.getFullName());
+                        tv_nameAssign.setText(u.getFullName());
+                    }
+                    listSearchUser.addAll(users);
                 }
             }
 
@@ -288,10 +328,16 @@ public class EditAssignmentActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Asset>> call, Response<List<Asset>> response) {
                 if (response.code() == 200) {
-                    assets.addAll(response.body());
-                    listSearchAsset.addAll(response.body().stream().filter(x->{
-                        return x.getState().equals("AVAILABLE");
-                    }).collect(Collectors.toList()));
+                    if(assets.size()==0)
+                        assets.addAll(response.body().stream().filter(x->x.getState().equals("AVAILABLE")).collect(Collectors.toList()));
+                    listSearchAsset.clear();
+                    response.body().stream().forEach(x -> {
+                        if (x.getState().equals("AVAILABLE")) {
+                            if (!assignment.getAssignmentDetails().stream().anyMatch(y -> x.getAssetCode().equals(y.getAssetCode()))) {
+                                listSearchAsset.add(x);
+                            }
+                        }
+                    });
                 }
             }
 
@@ -302,68 +348,84 @@ public class EditAssignmentActivity extends AppCompatActivity {
         });
     }
     public void selectAssignedDate(View v) {
-        if(status)
-        {
-            builder.setTitleText("Select assigned date");
-            builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
-            if(assignedDate!=0)
-            {
-                calendar.setTime(new Date(assignedDate));
-                builder.setSelection(calendar.getTimeInMillis());
-            }
-            materialDatePicker = builder.build();
-            calendar.clear();
-            materialDatePicker.show(getSupportFragmentManager(), "Date_picker");
-            materialDatePicker.addOnPositiveButtonClickListener(selection -> {
-                assignedDate = (long) selection;
-                String dateString = DateFormat.format("dd/MM/yyyy", new Date(assignedDate)).toString();
-                ed_assignedDate.setText(dateString);
-                tv_assignedDate.setText("Assigned Date: " + dateString);
-
-            });
+        builder.setTitleText("Select assigned date");
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
+        if (assignedDate != 0) {
+            calendar.setTime(new Date(assignedDate));
+            builder.setSelection(calendar.getTimeInMillis());
         }
+        materialDatePicker = builder.build();
+        calendar.clear();
+        materialDatePicker.show(getSupportFragmentManager(), "Date_picker");
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            assignedDate = (long) selection;
+            String dateString = DateFormat.format("dd/MM/yyyy", new Date(assignedDate)).toString();
+            ed_assignedDate.setText(dateString);
+            tv_assignedDate.setText("Assigned Date: " + dateString);
+
+        });
+
+    }
+
+    public void selectReturnedDate(View v) {
+        builder.setTitleText("Select returned date");
+        builder.setSelection(MaterialDatePicker.todayInUtcMilliseconds());
+        if (returnDate != 0) {
+            calendar.setTime(new Date(returnDate));
+            builder.setSelection(calendar.getTimeInMillis());
+        }
+        materialDatePicker = builder.build();
+        calendar.clear();
+        materialDatePicker.show(getSupportFragmentManager(), "Date_picker");
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            returnDate = (long) selection;
+            String dateString = DateFormat.format("dd/MM/yyyy", new Date(returnDate)).toString();
+            ed_returnDate.setText(dateString);
+
+        });
 
     }
     private void setStatus(Boolean status)
     {
-        ed_note.setEnabled(status);
         button_createAssign.setEnabled(status);
     }
     private void setData(Assignment data)
     {
-        tv_userSelect.setText(data.getAssignedTo());
-        tv_nameAssign.setText(data.getAssignedTo());
+
         ed_assignedDate.setText(data.getAssignedDate());
-        tv_assignedDate.setText("Assigned Date: " + data.getAssignedDate());
-        ed_note.setText(data.getNote());
-        idAssignmentEdit.setText("No."+data.getId());
+        ed_returnDate.setText(data.getIntendedReturnDate());
         List<String> temp=Arrays.asList(data.getAssignedDate().split("/"));
         calendar.set(Integer.parseInt(temp.get(2)),Integer.parseInt(temp.get(1))-1,Integer.parseInt(temp.get(0)));
         assignedDate=calendar.getTimeInMillis();
-        switch (data.getState()) {
-            case "ACCEPTED":
-                state.setText("Accepted");
-                state.setBackground(getResources().getDrawable(R.drawable.bg_green_status));
-                break;
-            case "WAITING_FOR_ACCEPTANCE":
-                state.setText("Waiting for acceptance");
-                state.setBackground(getResources().getDrawable(R.drawable.bg_yellow_status));
-                break;
-            case "WAITING_FOR_RETURNING":
-                state.setText("Waiting for returning");
-                state.setBackground(getResources().getDrawable(R.drawable.bg_orange_status));
-                break;
-            case "COMPLETED":
-                state.setText("Completed");
-                state.setBackground(getResources().getDrawable(R.drawable.bg_blue_status));
-                break;
-            case "CANCELED_ASSIGN":
-                state.setText("Declined");
-                state.setBackground(getResources().getDrawable(R.drawable.bg_red_status));
-                break;
-            default:
-                break;
-        }
+        temp=Arrays.asList(data.getIntendedReturnDate().split("/"));
+        calendar.set(Integer.parseInt(temp.get(2)),Integer.parseInt(temp.get(1))-1,Integer.parseInt(temp.get(0)));
+        returnDate=calendar.getTimeInMillis();
+        customListViewShowAssetSelectedAdapter = new CustomListViewShowAssetSelectedAdapter(this, assignment.getAssignmentDetails());
+        lv_assetSelect.setAdapter(customListViewShowAssetSelectedAdapter);
+//        switch (data.getState()) {
+//            case "ACCEPTED":
+//                state.setText("Accepted");
+//                state.setBackground(getResources().getDrawable(R.drawable.bg_green_status));
+//                break;
+//            case "WAITING_FOR_ACCEPTANCE":
+//                state.setText("Waiting for acceptance");
+//                state.setBackground(getResources().getDrawable(R.drawable.bg_yellow_status));
+//                break;
+//            case "WAITING_FOR_RETURNING":
+//                state.setText("Waiting for returning");
+//                state.setBackground(getResources().getDrawable(R.drawable.bg_orange_status));
+//                break;
+//            case "COMPLETED":
+//                state.setText("Completed");
+//                state.setBackground(getResources().getDrawable(R.drawable.bg_blue_status));
+//                break;
+//            case "CANCELED_ASSIGN":
+//                state.setText("Declined");
+//                state.setBackground(getResources().getDrawable(R.drawable.bg_red_status));
+//                break;
+//            default:
+//                break;
+//        }
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void searchUser(String input) {
@@ -379,19 +441,42 @@ public class EditAssignmentActivity extends AppCompatActivity {
             customListViewSearchUserAdapter.notifyDataSetChanged();
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void searchAsset(String input) {
         listSearchAsset.clear();
         String key = input.replaceAll("\\s{2,}", " ").trim();
         if (!key.equals("")) {
-            listSearchAsset.addAll(assets.stream().filter(x -> {
-                return x.getAssetCode().toLowerCase().contains(key.toLowerCase()) || x.getAssetName().toLowerCase().contains(key.toLowerCase());
-            }).collect(Collectors.toList()));
+            assets.stream().forEach(x -> {
+                if (x.getState().equals("AVAILABLE")) {
+                    if ((!assignment.getAssignmentDetails().stream().anyMatch(y -> x.getAssetCode().equals(y.getAssetCode())))
+                            && (x.getAssetCode().toLowerCase().contains(key.toLowerCase()) || x.getAssetName().toLowerCase().contains(key.toLowerCase()))
+                    ) {
+                        listSearchAsset.add(x);
+                    }
+                }
+            });
             customListViewSearchAssetAdapter.notifyDataSetChanged();
         } else {
             listSearchAsset.addAll(assets);
             customListViewSearchAssetAdapter.notifyDataSetChanged();
         }
     }
+    private String checkDate(String date) {
+        Date currentDate = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        format.setLenient(false);
+        Date assignedDate = new Date();
+        try {
+            assignedDate = format.parse(date);
+        } catch (Exception ex) {
+            return "Wrong date! (dd/MM/yyyy)";
+        }
 
+        long diff = TimeUnit.DAYS.convert(assignedDate.getTime() - currentDate.getTime(), TimeUnit.MILLISECONDS);
+        if (diff < 0) {
+            return "Assigned Date need to be equal or bigger than current date";
+        }
+        return "";
+    }
 }

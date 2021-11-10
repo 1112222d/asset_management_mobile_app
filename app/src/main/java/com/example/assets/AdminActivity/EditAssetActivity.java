@@ -36,8 +36,10 @@ import com.example.assets.AlterDialog.MessageDialog;
 import com.example.assets.MainActivity;
 import com.example.assets.Model.Asset;
 import com.example.assets.Model.Category;
+import com.example.assets.MyErrorMessage;
 import com.example.assets.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -136,11 +138,11 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
                                             "Delete success").show();
                                     finish();
                                 } else {
-                                    if (response.code() == 409) {
-                                        MessageDialog.getInstance(EditAssetActivity.this, "Error",
-                                                "Cannot delete the asset because it belongs to one or more historical assignments").show();
-
-                                    }
+                                    Gson gson = new Gson();
+                                    MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                                    MessageDialog.getInstance(EditAssetActivity.this, message.getError(),
+                                            message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
+                                    }).show();
                                 }
                             }
 
@@ -209,6 +211,12 @@ public class EditAssetActivity extends AppCompatActivity implements PopupMenu.On
                         if (response.code() == 200) {
                             MessageDialog.getInstance(EditAssetActivity.this, "Success",
                                     "Edit asset success").show();
+                        }else {
+                            Gson gson = new Gson();
+                            MyErrorMessage message = gson.fromJson(response.errorBody().charStream(), MyErrorMessage.class);
+                            MessageDialog.getInstance(EditAssetActivity.this, message.getError(),
+                                    message.getMessage()).setPositiveButton("OK", (dialog, which) -> {
+                            }).show();
                         }
                     }
 
